@@ -1,7 +1,5 @@
 package com.ibus.autowol.backend;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Host 
 {

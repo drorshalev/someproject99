@@ -5,16 +5,17 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import android.os.AsyncTask;
-import android.util.Log;
-import android.widget.ListView;
-import java.util.concurrent.Callable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.ListView;
 
 public class HostEnumerator extends AsyncTask<Void, Host, Boolean> 
 {
@@ -123,7 +124,6 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 				{
 					// A more reliable way of connecting to a pc and possibly of updating arp. note: we wont 
 					//be able to connect to a pc if all of the tested ports are closed
-		            int port;
 		            Socket s = new Socket();
 		            for (int i = 0; i < DPORTS.length; i++) 
 		            {
