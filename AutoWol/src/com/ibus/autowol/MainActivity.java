@@ -14,6 +14,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.ibus.autowol.ui.ActionBarNavigationListener;
 import com.ibus.autowol.ui.ActivityListItem;
 import com.ibus.autowol.ui.HostsFragment;
 import com.ibus.autowol.ui.NavigationSpinnerAdapter;
@@ -43,11 +44,18 @@ public class MainActivity extends SherlockFragmentActivity
     
     private void InitialiseActionBar()
     {
+    	List<ActivityListItem> ar = new ArrayList<ActivityListItem>();
+        ar.add(new ActivityListItem("Hosts", "Hosts"));
+        ar.add(new ActivityListItem("Policies", "Policies"));
+        ar.add(new ActivityListItem("Configuration", "Configuration"));
+    	
     	ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        actionBar.setListNavigationCallbacks(new NavigationSpinnerAdapter(ar, this), new ActionBarNavigationListener(this));
         
-        final SherlockFragmentActivity mainActivity = this;
+       
+        /*final SherlockFragmentActivity mainActivity = this;
         ActionBar.OnNavigationListener mOnNavigationListener = new ActionBar.OnNavigationListener() 
         {
         	  @Override
@@ -61,14 +69,8 @@ public class MainActivity extends SherlockFragmentActivity
         		  
         		  return true;
         	  }
-        };
+        };*/
         
-        List<ActivityListItem> ar = new ArrayList<ActivityListItem>();
-        ar.add(new ActivityListItem("Hosts", "Hosts"));
-        ar.add(new ActivityListItem("Policies", "Policies"));
-        ar.add(new ActivityListItem("Configuration", "Configuration"));
-        
-        actionBar.setListNavigationCallbacks(new NavigationSpinnerAdapter(ar, this), mOnNavigationListener);
     }
     
     
