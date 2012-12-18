@@ -10,8 +10,6 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.ibus.autowol.R;
-import com.ibus.autowol.R.id;
-import com.ibus.autowol.R.layout;
 
 
 public class NavigationSpinnerAdapter extends BaseAdapter implements SpinnerAdapter

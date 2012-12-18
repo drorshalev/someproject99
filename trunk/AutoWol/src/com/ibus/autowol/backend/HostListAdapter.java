@@ -2,16 +2,14 @@ package com.ibus.autowol.backend;
 
 import java.util.ArrayList;
 
-import com.ibus.autowol.R;
-import com.ibus.autowol.R.id;
-import com.ibus.autowol.R.layout;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import com.ibus.autowol.R;
 
 public class HostListAdapter extends ArrayAdapter<Host> 
 {

@@ -8,22 +8,19 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.SpinnerAdapter;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.ibus.autowol.ui.ActivityListItem;
+import com.ibus.autowol.ui.HostsFragment;
+import com.ibus.autowol.ui.NavigationSpinnerAdapter;
 //import android.app.ActionBar;
 //import android.view.Menu;
 //import android.view.MenuItem;
 //import com.actionbarsherlock.view.MenuInflater;
-import com.ibus.autowol.R;
-import com.ibus.autowol.ui.ActivityListItem;
-import com.ibus.autowol.ui.HostsFragment;
-import com.ibus.autowol.ui.NavigationSpinnerAdapter;
 
 
 public class MainActivity extends SherlockFragmentActivity 

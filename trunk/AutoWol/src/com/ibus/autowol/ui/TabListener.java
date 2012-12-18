@@ -2,10 +2,10 @@ package com.ibus.autowol.ui;
 
 import android.support.v4.app.FragmentTransaction;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.app.ActionBar;
 
 public class TabListener<T extends SherlockFragment> implements ActionBar.TabListener {
     private SherlockFragment mFragment;
