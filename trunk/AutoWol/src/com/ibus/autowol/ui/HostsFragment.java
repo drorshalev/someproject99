@@ -24,7 +24,7 @@ import com.ibus.autowol.backend.NetInfo;
 
 public class HostsFragment extends SherlockFragment 
 {
-	ArrayList<Host> hostList;
+	//ArrayList<Host> hostList;
 	HostListAdapter adapter;
 	HashSet<View> selectedHosts = new HashSet<View>();
 	public ActionMode actionMode;
@@ -141,14 +141,16 @@ public class HostsFragment extends SherlockFragment
 	     netInfo = new NetInfo(getActivity());
 	     netInfo.refresh();
 	     
+	     adapter = new HostListAdapter(getActivity(), R.id.ip_address, new ArrayList<Host>());
+	     
 	     ListView listView = (ListView) getActivity().findViewById(R.id.host_list);
 	     listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+	     listView.setOnItemClickListener(onItemClickListener); 
+	     listView.setAdapter(adapter);
 	     
 	     hostEnumerator = new HostEnumerator(netInfo.network_start, netInfo.network_end, netInfo.gatewayIp, listView);
 	     hostEnumerator.execute();
-	             
-        listView.setOnItemClickListener(onItemClickListener);
-        
+	    
 	}
 	
 	
