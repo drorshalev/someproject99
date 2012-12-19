@@ -42,6 +42,8 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	@Override
 	protected Boolean doInBackground(Void... params) 
 	{
+		Log.i(TAG, "Host enumeration starting");
+		
 	    ExecutorService executor = Executors.newFixedThreadPool(NTHREDS);
 	    List<Future<Host>> list = new ArrayList<Future<Host>>();
 	    
@@ -62,7 +64,10 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	      {
 	    	  Host h = future.get();
 	    	  if(h != null)
+	    	  {
+	    		  Log.i(TAG, "found host: " + h.getIpAddress().getAddress());
 	    		  this.publishProgress(h);
+	    	  }
 	    	  
 	      } catch (InterruptedException e) {
 	        e.printStackTrace();
@@ -72,12 +77,16 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	    }
 	    
 	    executor.shutdown();
+	    Log.i(TAG, "Host enumeration complete");
+	    
 	    return true;
 	}	
 	
 	@Override
 	protected void onProgressUpdate (Host... host)
 	{
+		Log.i(TAG, "updating list item for: " + host[0].getIpAddress().getAddress());
+		
 		HostListAdapter adap = (HostListAdapter)_listToPopulate.getAdapter();
 		adap.add(host[0]);
 		adap.notifyDataSetChanged();
@@ -110,6 +119,8 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 		{
 			Host host = new Host();
 			host.setIpAddress(addr);
+			
+			Log.i(TAG, "interogating: " + host.getIpAddress().getAddress());
 			
 			try 
 			{
