@@ -21,31 +21,25 @@ import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-public class NetInfo 
+public abstract class NetInfo 
 {
     //private SharedPreferences prefs;
-	private Context ctxt;
-    private final String TAG = "NetInfo";
+	private static Context ctxt;
+    private static final String TAG = "NetInfo";
     
-    public Nic deviceInterface;
-    public IpAddress deviceIp;
-    public IpAddress network_start;
-    public IpAddress network_end;
-    public IpAddress gatewayIp;
-    public IpAddress netmaskIp;
-    public WifiInfo wifiConnectionInfo;
-    public Cidr cidr;
-    
-    public String carrier = null;
+    public static Nic deviceInterface;
+    public static IpAddress deviceIp;
+    public static IpAddress network_start;
+    public static IpAddress network_end;
+    public static IpAddress gatewayIp;
+    public static IpAddress netmaskIp;
+    public static WifiInfo wifiConnectionInfo;
+    public static Cidr cidr;    
+    public static String carrier = null;
 
-    public NetInfo(final Context ctxt) {
-        this.ctxt = ctxt;
-        //prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
-        //refresh();
-    }
-
-    public void refresh()
+    public static void refresh(final Context ctxt)
     {
+    	NetInfo.ctxt = ctxt;
     	setDeviceIp();
     	setWifiInfo();
     	cidr = new Cidr(netmaskIp);
@@ -55,7 +49,7 @@ public class NetInfo
     /* NETWORK DISCOVERY METHODS 88888888888888888888888888888888888888888888888888888888888888888888888888888888888 */
     
     //set ip of the device to the first valid ip found a network interface
-    private void setDeviceIp() 
+    private static void setDeviceIp() 
     {
     	deviceInterface = new Nic();
         try 
@@ -82,7 +76,7 @@ public class NetInfo
     }
     
 
-    private boolean setWifiInfo() 
+    private static boolean setWifiInfo() 
     {
         WifiManager wifi = (WifiManager) ctxt.getSystemService(Context.WIFI_SERVICE);
         if (wifi != null) {
@@ -95,7 +89,7 @@ public class NetInfo
     }
     
     
-    private void setHostBounds()
+    private static void setHostBounds()
     {
     	long numericDeviceIp = deviceInterface.getAddress().toLong(); 
     	
@@ -121,7 +115,7 @@ public class NetInfo
     
     /* UTILITIES 8888888888888888888888888888888888888888888888888888888888888888888888888888888888888 */
     
-    private IpAddress getInterfaceFirstIp(NetworkInterface ni) 
+    private static IpAddress getInterfaceFirstIp(NetworkInterface ni) 
     {
     	IpAddress ip = new IpAddress();
     	
@@ -151,7 +145,7 @@ public class NetInfo
     
 
 
-    public boolean getMobileInfo() {
+    public static boolean getMobileInfo() {
         TelephonyManager tm = (TelephonyManager) ctxt.getSystemService(Context.TELEPHONY_SERVICE);
         if (tm != null) {
             carrier = tm.getNetworkOperatorName();
@@ -159,7 +153,7 @@ public class NetInfo
         return false;
     }
 
-    public String getNetIp() 
+    public static String getNetIp() 
     {
         int shift = (32 - cidr.getCidr());
         int start = ((int) IpAddress.getUnsignedLongFromIp(deviceIp.getAddress()) >> shift << shift);
@@ -186,7 +180,7 @@ public class NetInfo
     // return getIpFromIntSigned(dhcp.gateway);
     // }
 
-    public SupplicantState getSupplicantState() {
+    public static SupplicantState getSupplicantState() {
         return wifiConnectionInfo.getSupplicantState();
     }
 

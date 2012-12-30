@@ -13,6 +13,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import com.ibus.autowol.backend.Host.HostType;
+
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ListView;
@@ -99,6 +101,9 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	}
 	
 	
+	///
+	// HostEnumerationCallable /////////////////////////////////////////////////////////////////////////
+	///
 	
 	public class HostEnumerationCallable implements Callable<Host> 
 	{
@@ -119,6 +124,7 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 		{
 			Host host = new Host();
 			host.setIpAddress(addr);
+			host.setHostType(HostType.PC);
 			
 			Log.i(TAG, "interogating: " + host.getIpAddress().getAddress());
 			

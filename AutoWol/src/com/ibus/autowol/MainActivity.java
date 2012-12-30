@@ -14,6 +14,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.ibus.autowol.backend.NetInfo;
 import com.ibus.autowol.ui.ActionBarNavigationListener;
 import com.ibus.autowol.ui.ActivityListItem;
 import com.ibus.autowol.ui.HostsFragment;
@@ -35,10 +36,9 @@ public class MainActivity extends SherlockFragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        NetInfo.refresh(this);
+        
         InitialiseActionBar();
-        
-        
-        
     }
     
     
@@ -53,24 +53,6 @@ public class MainActivity extends SherlockFragmentActivity
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         actionBar.setListNavigationCallbacks(new NavigationSpinnerAdapter(ar, this), new ActionBarNavigationListener(this));
-        
-       
-        /*final SherlockFragmentActivity mainActivity = this;
-        ActionBar.OnNavigationListener mOnNavigationListener = new ActionBar.OnNavigationListener() 
-        {
-        	  @Override
-        	  public boolean onNavigationItemSelected(int position, long itemId) 
-        	  {
-        		  Fragment mFragment = SherlockFragment.instantiate(mainActivity, HostsFragment.class.getName());
-        		  
-        		  FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        		  ft.replace(android.R.id.content, mFragment, Long.toString(itemId));
-        		  ft.commit();
-        		  
-        		  return true;
-        	  }
-        };*/
-        
     }
     
     
@@ -82,21 +64,7 @@ public class MainActivity extends SherlockFragmentActivity
     	outState.putString("WORKAROUND_FOR_BUG_19917_KEY", "WORKAROUND_FOR_BUG_19917_VALUE");
     	super.onSaveInstanceState(outState);
     }
-    
-    
-    
-    //helper method
-    private void enableEmbeddedTabs(Object actionBar) {
-        try {
-            Method setHasEmbeddedTabsMethod = actionBar.getClass().getDeclaredMethod("setHasEmbeddedTabs", boolean.class);
-            setHasEmbeddedTabsMethod.setAccessible(true);
-            setHasEmbeddedTabsMethod.invoke(actionBar, true);
-        } catch (Exception e) {
-            Log.e(TAG, "Error marking actionbar embedded", e);
-        }
-    }
-    
-
+   
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
     	getSupportMenuInflater().inflate(R.menu.activity_main, menu);
@@ -121,6 +89,17 @@ public class MainActivity extends SherlockFragmentActivity
     
 
     
+    //helper method
+   /* private void enableEmbeddedTabs(Object actionBar) {
+        try {
+            Method setHasEmbeddedTabsMethod = actionBar.getClass().getDeclaredMethod("setHasEmbeddedTabs", boolean.class);
+            setHasEmbeddedTabsMethod.invoke(actionBar, true);
+        } catch (Exception e) {
+            Log.e(TAG, "Error marking actionbar embedded", e);
+        }
+    }*/
+    
+
     
     
     

@@ -4,6 +4,7 @@ package com.ibus.autowol.backend;
 public class Host 
 {
 	private HostType deviceType;
+	private int deviceTypeImage;
 	private IpAddress ipAddress;
 	private MacAddress macAddress;
 	
@@ -33,7 +34,12 @@ public class Host
 	public void setMacAddress(MacAddress hardwareAddress) {
 		this.macAddress = hardwareAddress;
 	}
-	
+	public int getDeviceTypeImage() {
+		return deviceTypeImage;
+	}
+	public void setDeviceTypeImage(int deviceTypeImage) {
+		this.deviceTypeImage = deviceTypeImage;
+	}
 	// Constructors //////////////////////////////////////////////////////////
 	
 	
