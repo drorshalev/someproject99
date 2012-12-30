@@ -18,8 +18,11 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.ibus.autowol.R;
 import com.ibus.autowol.backend.Host;
+import com.ibus.autowol.backend.Host.HostType;
 import com.ibus.autowol.backend.HostEnumerator;
 import com.ibus.autowol.backend.HostListAdapter;
+import com.ibus.autowol.backend.IpAddress;
+import com.ibus.autowol.backend.MacAddress;
 import com.ibus.autowol.backend.NetInfo;
 
 public class HostsFragment extends SherlockFragment 
@@ -28,7 +31,6 @@ public class HostsFragment extends SherlockFragment
 	HostListAdapter adapter;
 	HashSet<View> selectedHosts = new HashSet<View>();
 	public ActionMode actionMode;
-	NetInfo netInfo;
 	HostEnumerator hostEnumerator; 
 
 	//
@@ -135,53 +137,41 @@ public class HostsFragment extends SherlockFragment
     public void onActivityCreated(Bundle savedInstanceState) 
 	{
 		 super.onActivityCreated(savedInstanceState);
-		 TextView tv = (TextView) getActivity().findViewById(R.id.mac_address);
-	     tv.setText(getTag());
-	    
-	     netInfo = new NetInfo(getActivity());
-	     netInfo.refresh();
-	     
-	     adapter = new HostListAdapter(getActivity(), R.id.ip_address, new ArrayList<Host>());
+		
+		 Host h = new Host(new IpAddress());
+		 h.setHostType(HostType.PC);
+		 h.setMacAddress(new MacAddress());
+		 ArrayList<Host> l = new ArrayList<Host>();
+		 l.add(h);
+		 
+		 adapter = new HostListAdapter(getActivity(), R.id.ip_address, l);
+	     //adapter = new HostListAdapter(getActivity(), R.id.ip_address, new ArrayList<Host>());
 	     
 	     ListView listView = (ListView) getActivity().findViewById(R.id.host_list);
 	     listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 	     listView.setOnItemClickListener(onItemClickListener); 
 	     listView.setAdapter(adapter);
 	     
-	     hostEnumerator = new HostEnumerator(netInfo.network_start, netInfo.network_end, netInfo.gatewayIp, listView);
-	     hostEnumerator.execute();
+	     /*hostEnumerator = new HostEnumerator(NetInfo.network_start, NetInfo.network_end, NetInfo.gatewayIp, listView);
+	     hostEnumerator.execute();*/
 	    
 	}
 	
 	
-	/*private void PopulateList()
-    {
-		
-		
-    	hostList = new ArrayList<Host>();
-        
-        Host h = new Host();
-        h.setIpAddress("10.0.0.1");
-        h.setMacAddress("ff:ff:ff:ff");
-        hostList.add(h);
-        
-        Host b = new Host();
-        b.setIpAddress("10.0.0.2");
-        b.setMacAddress("ff:ff:ff:ff");
-        hostList.add(b);
-        
-        Host c = new Host();
-        c.setIpAddress("10.0.0.3");
-        c.setMacAddress("ff:ff:ff:ff");
-        hostList.add(c);
-        
-        adapter = new HostListAdapter(getActivity(), R.id.ip_address, hostList);
-        ListView hostListView = (ListView) getActivity().findViewById(R.id.host_list);
-        hostListView.setAdapter(adapter);
-    }*/
-
-	
-	
-	
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

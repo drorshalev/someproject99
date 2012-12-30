@@ -2,22 +2,56 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:padding="5dp">
     
-	<LinearLayout 
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:orientation="vertical" >
-	    
-	    <TextView android:id="@+id/ip_address"
-	        android:layout_width="wrap_content"
-	    	android:layout_height="wrap_content" />
-	    
-	    <TextView android:id="@+id/mac_address" 
-	        android:layout_width="wrap_content"
-	    	android:layout_height="wrap_content"/>
-	
-	</LinearLayout>
-
+    <ImageView android:src="@drawable/ic_pc"
+    android:layout_width="wrap_content"
+	android:layout_height="wrap_content" />
+    
+    
+    <TableLayout
+        android:layout_marginLeft="3dp"
+        android:layout_width="wrap_content"
+	    android:layout_height="wrap_content">
+        <TableRow
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content">
+            
+            <TextView android:text="Ip: "
+		        android:layout_width="wrap_content"
+		    	android:layout_height="wrap_content" />
+		    
+		    <TextView android:id="@+id/ip_address"
+		        android:layout_width="wrap_content"
+		    	android:layout_height="wrap_content" />
+		    
+        </TableRow>
+        <TableRow
+            android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content">
+		    
+            <TextView android:text="Mac: "
+		        android:layout_width="wrap_content"
+		    	android:layout_height="wrap_content" />
+	        
+		    <TextView android:id="@+id/mac_address" 
+		        android:layout_width="wrap_content"
+		    	android:layout_height="wrap_content"/>
+            
+		</TableRow>
+    </TableLayout>
+    
+    
+   <!--  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal"
+    android:padding="5dp"
+    >
+        
+        
+    </LinearLayout>
+     -->
 
 </LinearLayout>

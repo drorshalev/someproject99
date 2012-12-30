@@ -19,13 +19,13 @@ public class ActionBarNavigationListener implements ActionBar.OnNavigationListen
 	@Override
 	 public boolean onNavigationItemSelected(int position, long itemId) 
 	  {
-		  Fragment mFragment = SherlockFragment.instantiate(_activity, HostsFragment.class.getName());
+		  Fragment mFragment = SherlockFragment.instantiate(_activity, HostsFragment.class.getName()); 
 		  
 		  FragmentTransaction ft = _activity.getSupportFragmentManager().beginTransaction();
 		  ft.replace(android.R.id.content, mFragment, Long.toString(itemId));
 		  ft.commit();
 		  
-		  return true;
+		  return true;  
 	  }
 
 }
