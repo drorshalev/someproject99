@@ -1,31 +1,28 @@
 package com.ibus.autowol;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
+import android.app.Activity;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.ibus.autowol.backend.NetInfo;
 import com.ibus.autowol.ui.ActionBarNavigationListener;
 import com.ibus.autowol.ui.ActivityListItem;
-import com.ibus.autowol.ui.HostsFragment;
+import com.ibus.autowol.ui.NetworkScanActivity;
+import com.ibus.autowol.ui.PromptNetworkScanDialog;
 import com.ibus.autowol.ui.NavigationSpinnerAdapter;
-//import android.app.ActionBar;
-//import android.view.Menu;
-//import android.view.MenuItem;
-//import com.actionbarsherlock.view.MenuInflater;
 
 
-public class MainActivity extends SherlockFragmentActivity 
+
+public class MainActivity extends SherlockFragmentActivity implements PromptNetworkScanDialog.PromptNetworkScanDialogListener
 {	
 	private static final String TAG = "MainActivity";
 	//protected NetInfo net = null;
@@ -37,17 +34,17 @@ public class MainActivity extends SherlockFragmentActivity
         setContentView(R.layout.activity_main);
 
         NetInfo.refresh(this);
-        
         InitialiseActionBar();
+        PromptNetworkScan();
     }
     
     
     private void InitialiseActionBar()
     {
     	List<ActivityListItem> ar = new ArrayList<ActivityListItem>();
-        ar.add(new ActivityListItem("Hosts", "Hosts"));
-        ar.add(new ActivityListItem("Policies", "Policies"));
-        ar.add(new ActivityListItem("Configuration", "Configuration"));
+        ar.add(new ActivityListItem("Devices", "Devices"));
+        ar.add(new ActivityListItem("Rules", "Rules"));
+        ar.add(new ActivityListItem("Settings", "Settings"));
     	
     	ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
@@ -55,15 +52,27 @@ public class MainActivity extends SherlockFragmentActivity
         actionBar.setListNavigationCallbacks(new NavigationSpinnerAdapter(ar, this), new ActionBarNavigationListener(this));
     }
     
+    private void PromptNetworkScan()
+    {
+    	PromptNetworkScanDialog dlg = new PromptNetworkScanDialog();
+    	dlg.show(getSupportFragmentManager(), "PromptNetworkScanDialog");
+    }
     
     
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-    	//first saving my state, so the bundle wont be empty.
-    	//http://code.google.com/p/android/issues/detail?id=19917
-    	outState.putString("WORKAROUND_FOR_BUG_19917_KEY", "WORKAROUND_FOR_BUG_19917_VALUE");
-    	super.onSaveInstanceState(outState);
-    }
+	public void onPromptNetworkScanPositiveClick(DialogInterface dialog) 
+    {
+    	Intent intent = new Intent(this, NetworkScanActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+	}
+
+	@Override
+	public void onPromptNetworkScanNegativeClick(DialogInterface dialog) 
+	{
+	}
+    
+    
    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -72,20 +81,42 @@ public class MainActivity extends SherlockFragmentActivity
         return true;
     }
     
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            /*case android.R.id.home:
+    
+    
+    
+    /*@Override
+    public boolean onOptionsItemSelected(MenuItem item) 
+    {
+        return false;
+        
+        switch (item.getItemId()) 
+        {
+            case android.R.id.home:
                 // app icon in action bar clicked; go home
-                Intent intent = new Intent(this, HomeActivity.class);
+                Intent intent = new Intent(this, HostScanActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
-                return true;*/
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
+        
+        
+    }*/
+
     
+    
+
+    /*@Override
+     * public void onSaveInstanceState(Bundle outState) {
+    	//first saving my state, so the bundle wont be empty.
+    	//http://code.google.com/p/android/issues/detail?id=19917
+    	outState.putString("WORKAROUND_FOR_BUG_19917_KEY", "WORKAROUND_FOR_BUG_19917_VALUE");
+    	super.onSaveInstanceState(outState);
+    }*/
+   
+
+
     
 
     
