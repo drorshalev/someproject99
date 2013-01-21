@@ -929,13 +929,14 @@ containing a value of this type.
         public static final int ic_action_add=0x7f020073;
         public static final int ic_action_alarm=0x7f020074;
         public static final int ic_action_delete=0x7f020075;
-        public static final int ic_action_search=0x7f020076;
-        public static final int ic_launcher=0x7f020077;
-        public static final int ic_pc=0x7f020078;
-        public static final int list_item_background_selector=0x7f020079;
-        public static final int selected_background=0x7f02007a;
-        public static final int spinner_default_holo_light=0x7f02007b;
-        public static final int spinner_disabled_holo_light=0x7f02007c;
+        public static final int ic_action_power=0x7f020076;
+        public static final int ic_action_search=0x7f020077;
+        public static final int ic_launcher=0x7f020078;
+        public static final int ic_pc=0x7f020079;
+        public static final int list_item_background_selector=0x7f02007a;
+        public static final int selected_background=0x7f02007b;
+        public static final int spinner_default_holo_light=0x7f02007c;
+        public static final int spinner_disabled_holo_light=0x7f02007d;
     }
     public static final class id {
         public static final int abs__action_bar=0x7f040022;
@@ -980,14 +981,14 @@ containing a value of this type.
         public static final int abs__up=0x7f04000b;
         public static final int activity_list_item_description=0x7f040033;
         public static final int add_host=0x7f040039;
-        public static final int delete_host=0x7f04003b;
+        public static final int delete_host=0x7f04003a;
         public static final int disableHome=0x7f040009;
         public static final int edit_query=0x7f040027;
         public static final int homeAsUp=0x7f040006;
-        public static final int host_list=0x7f040036;
-        public static final int ip_address=0x7f040037;
+        public static final int host_list=0x7f040035;
+        public static final int ip_address=0x7f040036;
         public static final int listMode=0x7f040002;
-        public static final int mac_address=0x7f040035;
+        public static final int mac_address=0x7f040037;
         public static final int mainFragmentPanel=0x7f040034;
         public static final int menu_settings=0x7f040038;
         public static final int normal=0x7f040001;
@@ -996,7 +997,7 @@ containing a value of this type.
         public static final int showTitle=0x7f040007;
         public static final int tabMode=0x7f040003;
         public static final int useLogo=0x7f040004;
-        public static final int wake_host=0x7f04003a;
+        public static final int wake_host=0x7f04003b;
         public static final int wrap_content=0x7f040000;
     }
     public static final class integer {
@@ -1031,8 +1032,9 @@ containing a value of this type.
         public static final int activity_main=0x7f030019;
         public static final int host_fragment=0x7f03001a;
         public static final int host_list_item=0x7f03001b;
-        public static final int sherlock_spinner_dropdown_item=0x7f03001c;
-        public static final int sherlock_spinner_item=0x7f03001d;
+        public static final int network_scan_activity=0x7f03001c;
+        public static final int sherlock_spinner_dropdown_item=0x7f03001d;
+        public static final int sherlock_spinner_item=0x7f03001e;
     }
     public static final class menu {
         public static final int activity_display_message=0x7f0c0000;
@@ -1093,6 +1095,10 @@ containing a value of this type.
         public static final int edit_message=0x7f090012;
         public static final int hello_world=0x7f090014;
         public static final int menu_settings=0x7f090010;
+        public static final int prompt_network_scan_dialog_fragment_cancel=0x7f09001b;
+        public static final int prompt_network_scan_dialog_fragment_message=0x7f090019;
+        public static final int prompt_network_scan_dialog_fragment_ok=0x7f09001a;
+        public static final int prompt_network_scan_dialog_fragment_title=0x7f09001c;
         public static final int title_activity_display_message=0x7f090015;
         public static final int title_activity_main=0x7f090011;
         public static final int wake_host_button_title=0x7f090016;
