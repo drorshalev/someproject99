@@ -1,8 +1,11 @@
 package com.ibus.autowol.backend;
 
+import java.io.Serializable;
 
-public class Host 
+
+public class Host implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	private HostType deviceType;
 	private int deviceTypeImage;
 	private IpAddress ipAddress;
