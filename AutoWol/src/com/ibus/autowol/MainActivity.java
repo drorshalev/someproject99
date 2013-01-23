@@ -1,5 +1,6 @@
 package com.ibus.autowol;
 
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import android.app.Activity;
@@ -13,7 +14,12 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.ibus.autowol.backend.Host;
+import com.ibus.autowol.backend.Host.HostType;
+import com.ibus.autowol.backend.IpAddress;
+import com.ibus.autowol.backend.MacAddress;
 import com.ibus.autowol.backend.NetInfo;
+import com.ibus.autowol.backend.Serialiser;
 import com.ibus.autowol.ui.ActionBarNavigationListener;
 import com.ibus.autowol.ui.ActivityListItem;
 import com.ibus.autowol.ui.NetworkScanActivity;
@@ -75,10 +81,11 @@ public class MainActivity extends SherlockFragmentActivity implements PromptNetw
     
    
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) 
+    {
     	getSupportMenuInflater().inflate(R.menu.activity_main, menu);
         
-        return true;
+        return true; 
     }
     
     

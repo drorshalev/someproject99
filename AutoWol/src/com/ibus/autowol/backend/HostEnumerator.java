@@ -13,11 +13,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import com.ibus.autowol.backend.Host.HostType;
-
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ListView;
+
+import com.ibus.autowol.backend.Host.HostType;
+import com.ibus.autowol.ui.OnHostFoundListener;
+import com.ibus.autowol.ui.OnHostSearchCompleteListener;
 
 public class HostEnumerator extends AsyncTask<Void, Host, Boolean> 
 {
@@ -28,17 +29,19 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	IpAddress networkEnd;
 	IpAddress gatewayIp;
 	long netowrkSize;
-	ListView _listToPopulate;
+	List<OnHostFoundListener> _hostFoundListeners;
+	List<OnHostSearchCompleteListener> _hostSearchCompleteListener; 
 	
 	
 	public HostEnumerator(){}
-	public HostEnumerator(IpAddress networkStart, IpAddress networkEnd, IpAddress gatewayIp, ListView listToPopulate)
+	public HostEnumerator(IpAddress networkStart, IpAddress networkEnd, IpAddress gatewayIp)
 	{
 		this.networkStart = networkStart;
 		this.networkEnd = networkEnd;
 		this.gatewayIp = gatewayIp;
 		this.netowrkSize = networkEnd.toLong() - networkStart.toLong() + 1;
-		_listToPopulate = listToPopulate;
+		_hostFoundListeners = new ArrayList<OnHostFoundListener>();
+		_hostSearchCompleteListener = new ArrayList<OnHostSearchCompleteListener>(); 
 	}
 	
 	@Override
@@ -79,8 +82,6 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	    }
 	    
 	    executor.shutdown();
-	    Log.i(TAG, "Host enumeration complete");
-	    
 	    return true;
 	}	
 	
@@ -89,16 +90,33 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	{
 		Log.i(TAG, "updating list item for: " + host[0].getIpAddress().getAddress());
 		
-		HostListAdapter adap = (HostListAdapter)_listToPopulate.getAdapter();
-		adap.add(host[0]);
-		adap.notifyDataSetChanged();
+		for (OnHostFoundListener listener : _hostFoundListeners) 
+		{
+			listener.onHostFound(host[0]);
+        }
+		
 	}
+	
 	
 	@Override
 	protected void onPostExecute (Boolean result)
 	{
+		Log.i(TAG, "Host enumeration complete");
 		
+		for (OnHostSearchCompleteListener listener : _hostSearchCompleteListener) 
+		{
+			listener.onSearchComplete();
+        }
 	}
+	
+	
+	public void addHostFoundListener(OnHostFoundListener listener) {
+		_hostFoundListeners.add(listener);
+    }
+	
+	public void addHostSearchCompleteListener(OnHostSearchCompleteListener listener) {
+		_hostSearchCompleteListener.add(listener);
+    }
 	
 	
 	///

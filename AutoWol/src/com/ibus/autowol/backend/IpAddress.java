@@ -1,10 +1,12 @@
 package com.ibus.autowol.backend;
 
-public class IpAddress 
+import java.io.Serializable;
+
+public class IpAddress implements Serializable 
 {
+	private static final long serialVersionUID = 1L;
 	public static final String NOIP = "0.0.0.0";
     public static final String NOMASK = "255.255.255.255";
-    
     private String _address;
     
     // Properties ///////////////////////////////////////////////

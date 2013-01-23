@@ -3,13 +3,15 @@ package com.ibus.autowol.backend;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.util.Log;
 
-public class MacAddress 
+public class MacAddress implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	private final static String TAG = "HardwareAddress";
     private final static String REQ = "select vendor from oui where mac=?";
     private final static String MAC_RE = "^%s\\s+0x1\\s+0x2\\s+([:0-9a-fA-F]+)\\s+\\*\\s+\\w+$";
