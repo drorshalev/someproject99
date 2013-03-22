@@ -11,16 +11,42 @@ import android.util.Log;
 
 public class MacAddress implements Serializable
 {
-	private static final long serialVersionUID = 1L;
+	private final static long serialVersionUID = 1L;
 	private final static String TAG = "HardwareAddress";
     private final static String REQ = "select vendor from oui where mac=?";
     private final static String MAC_RE = "^%s\\s+0x1\\s+0x2\\s+([:0-9a-fA-F]+)\\s+\\*\\s+\\w+$";
     private final static int BUF = 8 * 1024;
-    //private WeakReference<Activity> mActivity;
 	public static final String NOMAC = "00:00:00:00:00:00";
+	
 	private String _address;
 	
 	// Properties //////////////////////////////////////////////////////////
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((_address == null) ? 0 : _address.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MacAddress other = (MacAddress) obj;
+		if (_address == null) {
+			if (other._address != null)
+				return false;
+		} else if (!_address.equals(other._address))
+			return false;
+		return true;
+	}
 
 	public String getAddress() {
 		return _address;

@@ -1,12 +1,11 @@
 package com.ibus.autowol.ui;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.MenuItem;
 import com.ibus.autowol.R;
 
-public class DeviceListClickListener extends ListClickListener 
+public class DeviceListClickListener extends ListClickListener
 {
 
 	public DeviceListClickListener(SherlockFragmentActivity activity) {

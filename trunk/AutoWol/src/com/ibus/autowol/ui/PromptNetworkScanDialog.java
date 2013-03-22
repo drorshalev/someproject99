@@ -38,11 +38,13 @@ public class PromptNetworkScanDialog extends DialogFragment
                    }
                });
         
+        
+        
         // Create the AlertDialog object and return it
         return builder.create();
     }
    	
-   	@Override
+   /*	@Override
     public void onAttach(Activity activity) 
     {
    		super.onAttach(activity);
@@ -50,6 +52,18 @@ public class PromptNetworkScanDialog extends DialogFragment
         try 
         {
         	_listener = (PromptNetworkScanDialogListener) activity;
+        } 
+        catch (ClassCastException e) 
+        {
+            throw new ClassCastException(activity.toString() + " must implement NoticeDialogListener");
+        }
+    }*/
+   	
+   	public void onAttach(PromptNetworkScanDialogListener activity) 
+    {
+        try 
+        {
+        	_listener = activity;
         } 
         catch (ClassCastException e) 
         {

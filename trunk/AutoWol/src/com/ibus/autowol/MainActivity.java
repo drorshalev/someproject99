@@ -1,36 +1,27 @@
 package com.ibus.autowol;
 
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import android.app.Activity;
-import android.content.DialogInterface;
+
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentTransaction;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.ibus.autowol.backend.Host;
-import com.ibus.autowol.backend.Host.HostType;
-import com.ibus.autowol.backend.IpAddress;
-import com.ibus.autowol.backend.MacAddress;
 import com.ibus.autowol.backend.NetInfo;
-import com.ibus.autowol.backend.Serialiser;
 import com.ibus.autowol.ui.ActionBarNavigationListener;
 import com.ibus.autowol.ui.ActivityListItem;
-import com.ibus.autowol.ui.NetworkScanActivity;
-import com.ibus.autowol.ui.PromptNetworkScanDialog;
 import com.ibus.autowol.ui.NavigationSpinnerAdapter;
+import com.ibus.autowol.ui.NetworkScanActivity;
 
 
 
-public class MainActivity extends SherlockFragmentActivity implements PromptNetworkScanDialog.PromptNetworkScanDialogListener
+public class MainActivity extends SherlockFragmentActivity 
 {	
 	private static final String TAG = "MainActivity";
+	private ActionBarNavigationListener _actionBarNavigationListener;
 	//protected NetInfo net = null;
 	
 
@@ -41,7 +32,6 @@ public class MainActivity extends SherlockFragmentActivity implements PromptNetw
 
         NetInfo.refresh(this);
         InitialiseActionBar();
-        PromptNetworkScan();
     }
     
     
@@ -52,32 +42,13 @@ public class MainActivity extends SherlockFragmentActivity implements PromptNetw
         ar.add(new ActivityListItem("Rules", "Rules"));
         ar.add(new ActivityListItem("Settings", "Settings"));
     	
+        _actionBarNavigationListener = new ActionBarNavigationListener(this);
+        
     	ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        actionBar.setListNavigationCallbacks(new NavigationSpinnerAdapter(ar, this), new ActionBarNavigationListener(this));
+        actionBar.setListNavigationCallbacks(new NavigationSpinnerAdapter(ar, this), _actionBarNavigationListener);
     }
-    
-    private void PromptNetworkScan()
-    {
-    	PromptNetworkScanDialog dlg = new PromptNetworkScanDialog();
-    	dlg.show(getSupportFragmentManager(), "PromptNetworkScanDialog");
-    }
-    
-    
-    @Override
-	public void onPromptNetworkScanPositiveClick(DialogInterface dialog) 
-    {
-    	Intent intent = new Intent(this, NetworkScanActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-	}
-
-	@Override
-	public void onPromptNetworkScanNegativeClick(DialogInterface dialog) 
-	{
-	}
-    
     
    
     @Override
@@ -90,6 +61,50 @@ public class MainActivity extends SherlockFragmentActivity implements PromptNetw
     
     
     
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) 
+    {
+        switch (item.getItemId()) 
+        {
+            case R.id.add_host:
+            	GoToNetworkScanActivity();    	
+        }
+        
+        return true;
+    }
+    
+    public void GoToNetworkScanActivity()
+    {
+    	Intent intent = new Intent(this, NetworkScanActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+    
+    
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Another activity is taking focus (this activity is about to be "paused").
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // The activity is no longer visible (it is now "stopped")
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // The activity is about to be destroyed.
+    }
+    
+
+	@Override
+	protected void onNewIntent(Intent intent) 
+	{
+	    super.onNewIntent(intent);
+	    intent.getStringExtra("DATA");
+	} 
     
     /*@Override
     public boolean onOptionsItemSelected(MenuItem item) 
