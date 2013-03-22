@@ -8,6 +8,46 @@ public class Host implements Serializable
 	private static final long serialVersionUID = 1L;
 	private HostType deviceType;
 	private int deviceTypeImage;
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((deviceType == null) ? 0 : deviceType.hashCode());
+		result = prime * result + deviceTypeImage;
+		result = prime * result
+				+ ((ipAddress == null) ? 0 : ipAddress.hashCode());
+		result = prime * result
+				+ ((macAddress == null) ? 0 : macAddress.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Host other = (Host) obj;
+		if (deviceType != other.deviceType)
+			return false;
+		if (deviceTypeImage != other.deviceTypeImage)
+			return false;
+		if (ipAddress == null) {
+			if (other.ipAddress != null)
+				return false;
+		} else if (!ipAddress.equals(other.ipAddress))
+			return false;
+		if (macAddress == null) {
+			if (other.macAddress != null)
+				return false;
+		} else if (!macAddress.equals(other.macAddress))
+			return false;
+		return true;
+	}
+
 	private IpAddress ipAddress;
 	private MacAddress macAddress;
 	

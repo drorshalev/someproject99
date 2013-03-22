@@ -17,8 +17,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.ibus.autowol.backend.Host.HostType;
-import com.ibus.autowol.ui.OnHostFoundListener;
 import com.ibus.autowol.ui.OnHostSearchCompleteListener;
+import com.ibus.autowol.ui.OnHostSearchProgressListener;
 
 public class HostEnumerator extends AsyncTask<Void, Host, Boolean> 
 {
@@ -29,7 +29,7 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	IpAddress networkEnd;
 	IpAddress gatewayIp;
 	long netowrkSize;
-	List<OnHostFoundListener> _hostFoundListeners;
+	List<OnHostSearchProgressListener> _hostSearchProgressListeners;
 	List<OnHostSearchCompleteListener> _hostSearchCompleteListener; 
 	
 	
@@ -40,14 +40,35 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 		this.networkEnd = networkEnd;
 		this.gatewayIp = gatewayIp;
 		this.netowrkSize = networkEnd.toLong() - networkStart.toLong() + 1;
-		_hostFoundListeners = new ArrayList<OnHostFoundListener>();
+		_hostSearchProgressListeners = new ArrayList<OnHostSearchProgressListener>();
 		_hostSearchCompleteListener = new ArrayList<OnHostSearchCompleteListener>(); 
 	}
 	
 	@Override
 	protected Boolean doInBackground(Void... params) 
 	{
-		Log.i(TAG, "Host enumeration starting");
+		try {
+			InetAddress in = InetAddress.getByName("10.0.0.99");
+			
+			 if (in.isReachable(5000)) {
+				 Log.i("NetworkScanActivity", "host ping successfull"); 
+			 }
+			 else
+			 {
+				 Log.i("NetworkScanActivity", "host ping NOT successfull");
+			 }
+			
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return true;
+		
+		/*Log.i(TAG, "Host enumeration starting");
 		
 	    ExecutorService executor = Executors.newFixedThreadPool(NTHREDS);
 	    List<Future<Host>> list = new ArrayList<Future<Host>>();
@@ -69,11 +90,10 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	      {
 	    	  Host h = future.get();
 	    	  if(h != null)
-	    	  {
 	    		  Log.i(TAG, "found host: " + h.getIpAddress().getAddress());
-	    		  this.publishProgress(h);
-	    	  }
 	    	  
+	    	  this.publishProgress(h);
+	    		
 	      } catch (InterruptedException e) {
 	        e.printStackTrace();
 	      } catch (ExecutionException e) {
@@ -82,18 +102,28 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	    }
 	    
 	    executor.shutdown();
-	    return true;
+	    return true;*/
 	}	
 	
 	@Override
 	protected void onProgressUpdate (Host... host)
 	{
-		Log.i(TAG, "updating list item for: " + host[0].getIpAddress().getAddress());
-		
-		for (OnHostFoundListener listener : _hostFoundListeners) 
+		if(host[0] != null)
 		{
-			listener.onHostFound(host[0]);
-        }
+			Log.i(TAG, "updating list item for: " + host[0].getIpAddress().getAddress());
+		
+			for (OnHostSearchProgressListener listener : _hostSearchProgressListeners) 
+			{
+				listener.onHostSearchProgress(host[0]);
+	        }
+		}
+		else
+		{
+			for (OnHostSearchProgressListener listener : _hostSearchProgressListeners) 
+			{
+				listener.onHostSearchProgress(null);
+	        }
+		}
 		
 	}
 	
@@ -110,8 +140,8 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	}
 	
 	
-	public void addHostFoundListener(OnHostFoundListener listener) {
-		_hostFoundListeners.add(listener);
+	public void addHostSearchProgressListener(OnHostSearchProgressListener listener) {
+		_hostSearchProgressListeners.add(listener);
     }
 	
 	public void addHostSearchCompleteListener(OnHostSearchCompleteListener listener) {

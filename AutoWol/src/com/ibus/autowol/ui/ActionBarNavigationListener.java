@@ -1,21 +1,16 @@
 package com.ibus.autowol.ui;
 
-import java.util.ArrayList;
-
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.ibus.autowol.backend.Host;
-import com.ibus.autowol.backend.IpAddress;
-import com.ibus.autowol.backend.MacAddress;
-import com.ibus.autowol.backend.Host.HostType;
 
 public class ActionBarNavigationListener implements ActionBar.OnNavigationListener
 {
 	SherlockFragmentActivity _activity;
+	DevicesListFragment _devicesListFragment;
+	
 
 	public ActionBarNavigationListener(SherlockFragmentActivity activity)
 	{
@@ -32,23 +27,41 @@ public class ActionBarNavigationListener implements ActionBar.OnNavigationListen
 	
 	private boolean DisplayDevicesFragment()
 	{
-		 Host h = new Host(new IpAddress());
-		 h.setHostType(HostType.PC);
-		 h.setMacAddress(new MacAddress());
-		 ArrayList<Host> l = new ArrayList<Host>();
-		 l.add(h);
-		
-		
-		DevicesListFragment mFragment = (DevicesListFragment)SherlockFragment.instantiate(_activity, DevicesListFragment.class.getName()); 
-		mFragment.listClickListener = new DeviceListClickListener(_activity);
-		mFragment.devices = l;  
-		
+		DevicesListFragment devicesListFragment = getDevicesListFragment();
 		
 		FragmentTransaction ft = _activity.getSupportFragmentManager().beginTransaction();
-		ft.replace(android.R.id.content, mFragment);
+		ft.replace(android.R.id.content, devicesListFragment);
 		ft.commit();
 		
 		return true;  
 	}
+	
 
+	public DevicesListFragment getDevicesListFragment()
+	{
+		if(_devicesListFragment == null)
+		{
+			_devicesListFragment = (DevicesListFragment)SherlockFragment.instantiate(_activity, DevicesListFragment.class.getName()); 
+		}
+		return _devicesListFragment;
+	}
+	
+
+	
+	
+	    
+		    
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

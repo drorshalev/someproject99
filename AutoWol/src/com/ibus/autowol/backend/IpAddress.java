@@ -7,6 +7,7 @@ public class IpAddress implements Serializable
 	private static final long serialVersionUID = 1L;
 	public static final String NOIP = "0.0.0.0";
     public static final String NOMASK = "255.255.255.255";
+    
     private String _address;
     
     // Properties ///////////////////////////////////////////////
@@ -76,7 +77,7 @@ public class IpAddress implements Serializable
         return ip.substring(0, ip.length() - 1);
     }
 
-    public static String getIpFromLongUnsigned(long ip_long) 
+	public static String getIpFromLongUnsigned(long ip_long) 
     {
         String ip = "";
         for (int k = 3; k > -1; k--) {
@@ -84,8 +85,37 @@ public class IpAddress implements Serializable
         }
         return ip.substring(0, ip.length() - 1);
     }
-  
+	
+	
 	@Override
+	public int hashCode() 
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((_address == null) ? 0 : _address.hashCode());
+		return result;
+	}
+	
+	@Override
+	public boolean equals(Object obj) 
+	{
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		IpAddress other = (IpAddress) obj;
+		if (_address == null) {
+			if (other._address != null)
+				return false;
+		} else if (!_address.equals(other._address))
+			return false;
+		return true;
+	}
+  
+	/*@Override
 	public boolean equals(Object o) 
 	{
 		if (o == null) return false;
@@ -100,7 +130,7 @@ public class IpAddress implements Serializable
 	public int hashCode() 
 	{
 		return getAddress().hashCode();
-	}
+	}*/
     
 }
 

@@ -1,6 +1,6 @@
 package com.ibus.autowol.backend;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,14 +13,13 @@ import com.ibus.autowol.R;
 
 public class HostListAdapter extends ArrayAdapter<Host> 
 {
-	private ArrayList<Host> objects;
+	private List<Host> _objects;
 
-	public HostListAdapter(Context context, int textViewResourceId, ArrayList<Host> objects) 
+	public HostListAdapter(Context context, int textViewResourceId, List<Host> objects) 
 	{
 		super(context, textViewResourceId, objects);
-		this.objects = objects;
+		this._objects = objects;
 	}
-
 	
 	public View getView(int position, View convertView, ViewGroup parent)
 	{
@@ -32,7 +31,7 @@ public class HostListAdapter extends ArrayAdapter<Host>
 			v = inflater.inflate(R.layout.host_list_item, null);
 		}
 
-		Host host = objects.get(position); 
+		Host host = _objects.get(position); 
 		
 		if (host != null) 
 		{
@@ -42,8 +41,14 @@ public class HostListAdapter extends ArrayAdapter<Host>
 			ip.setText(host.getIpAddress().getAddress());
 			mac.setText(host.getMacAddress().getAddress());
 		}
-
+		
+		v.setTag(host);
 		return v;
+	}
+	
+	public List<Host> GetItems()
+	{
+		return _objects;
 	}
 
 }

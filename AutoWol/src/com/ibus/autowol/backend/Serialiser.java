@@ -1,6 +1,5 @@
 package com.ibus.autowol.backend;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -8,19 +7,70 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
-
-import com.actionbarsherlock.app.SherlockFragmentActivity;
+import java.util.HashSet;
+import java.util.List;
 
 import android.content.Context;
 import android.util.Log;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+
 public abstract class Serialiser 
 {
 	private static final String TAG = "Serialiser";
+	private static final String _devicesFile = "devices.bin";
+	
+	
+	public static void AddHosts(HashSet<Host> hosts, SherlockFragmentActivity activity)
+	{
+		@SuppressWarnings("unchecked")
+		HashSet<Host> savedDevices = GetHosts(activity);
+		savedDevices.addAll(hosts);
+		
+		Serialise(savedDevices, _devicesFile, activity);
+	}
+	
+	public static void AddHosts(List<Host> hosts, SherlockFragmentActivity activity)
+	{
+		@SuppressWarnings("unchecked")
+		HashSet<Host> savedDevices = GetHosts(activity);
+		savedDevices.addAll(hosts);
+		
+		Serialise(savedDevices, _devicesFile, activity);
+	}
+	
+	public static void DeleteHost(Host host, SherlockFragmentActivity activity)
+	{
+		@SuppressWarnings("unchecked")
+		HashSet<Host> savedDevices = GetHosts(activity);
+		savedDevices.remove(host);
+		
+		Serialise(savedDevices, _devicesFile, activity);
+	}
+	
+	public static void AddHost(Host host, SherlockFragmentActivity activity)
+	{
+		@SuppressWarnings("unchecked")
+		HashSet<Host> savedDevices = GetHosts(activity);
+		savedDevices.add(host);
+		
+		Serialise(savedDevices, _devicesFile, activity);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static HashSet<Host> GetHosts(SherlockFragmentActivity activity)
+	{
+		HashSet<Host> hl = (HashSet<Host>)Serialiser.Deserialise(_devicesFile, activity);
+		if(hl == null)
+			hl = new HashSet<Host>();
+		
+		return hl;
+	}
+	
+	
 	
 	public static void Serialise(Object objectToSave, String fileName, SherlockFragmentActivity activity)
 	{
-		
 		ObjectOutputStream oos;
 		try 
 		{
@@ -56,18 +106,21 @@ public abstract class Serialiser
 			return o;
 		} 
 		catch (StreamCorruptedException e) {
-			Log.e(TAG, "Could not serialise object", e);	
+			Log.e(TAG, "Could not deserialise object", e);	
 		} 
 		catch (FileNotFoundException e) {
-			Log.e(TAG, "Could not serialise object", e);	
+			Log.e(TAG, "Could not deserialise object", e);	
 		} 
 		catch (IOException e) {
-			Log.e(TAG, "Could not serialise object", e);	
+			Log.e(TAG, "Could not deserialise object", e);	
 		} 
 		catch (ClassNotFoundException e) {
-			Log.e(TAG, "Could not serialise object", e);	
+			Log.e(TAG, "Could not deserialise object", e);	
 		}
 		
 		return null;
 	}
+	
+	
+	
 }

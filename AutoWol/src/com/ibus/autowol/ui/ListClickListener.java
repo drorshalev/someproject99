@@ -1,9 +1,10 @@
 package com.ibus.autowol.ui;
 
 import java.util.HashSet;
+
 import android.view.View;
 import android.widget.AdapterView;
-import com.actionbarsherlock.app.SherlockFragment;
+
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
@@ -29,6 +30,7 @@ public abstract class ListClickListener implements AdapterView.OnItemClickListen
 		_activity = activity;
 		_selectionContextMenu = selectionContextMenu;
 	}
+	
 	
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View view, int position, long arg3) 
@@ -60,7 +62,6 @@ public abstract class ListClickListener implements AdapterView.OnItemClickListen
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) 
 		{
 			MenuInflater inflater = mode.getMenuInflater();
-			//inflater.inflate(R.menu.hosts_selected_context_menu, menu);
 			inflater.inflate(_selectionContextMenu, menu);
 			return true;
 		}
@@ -86,9 +87,9 @@ public abstract class ListClickListener implements AdapterView.OnItemClickListen
 		
 		public void clearSelectedItems()
 		{
-			for (View host : _selectedItems) 
+			for (View item : _selectedItems) 
 			{
-				host.setBackgroundColor(_activity.getResources().getColor(R.color.awol_white));
+				item.setBackgroundColor(_activity.getResources().getColor(R.color.awol_white));
 			}
 			
 			_selectedItems.clear();
@@ -97,7 +98,7 @@ public abstract class ListClickListener implements AdapterView.OnItemClickListen
 	
 	public abstract boolean actionItemClicked(ActionMode mode, MenuItem item);
 	
-	
+
 };
 
 
