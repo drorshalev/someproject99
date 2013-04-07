@@ -5,9 +5,75 @@ import java.io.Serializable;
 
 public class Host implements Serializable
 {
+	public enum HostType
+	{
+		PC,
+		Gateway
+	}
 	private static final long serialVersionUID = 1L;
-	private HostType deviceType;
 	private int deviceTypeImage;
+	private HostType deviceType;
+	private String ipAddress;
+	private String macAddress;
+	private String name;
+	private String nicName;
+	
+
+	// Properties //////////////////////////////////////////////////////////
+
+	public HostType getDeviceType() {
+		return deviceType;
+	}
+	public void setDeviceType(HostType hostType) {
+		this.deviceType = hostType;
+	}
+	public String getIpAddress() {
+		return ipAddress;
+	}
+	public void setIpAddress(String ipAddress) {
+		this.ipAddress = ipAddress;
+	}
+	public String getMacAddress() {
+		return macAddress;
+	}
+	public void setMacAddress(String hardwareAddress) {
+		this.macAddress = hardwareAddress;
+	}
+	public int getDeviceTypeImage() {
+		return deviceTypeImage;
+	}
+	public void setDeviceTypeImage(int deviceTypeImage) {
+		this.deviceTypeImage = deviceTypeImage;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getNicName() {
+		return nicName;
+	}
+	public void setNicName(String nicName) {
+		this.nicName = nicName;
+	}
+	
+	
+	
+	// Constructors //////////////////////////////////////////////////////////
+	
+	public Host()
+	{
+		setDeviceType(HostType.PC);
+	}
+	
+	public Host(String ip)
+	{
+		this();
+		setIpAddress(ip);
+	}
+	
+	
 	
 	@Override
 	public int hashCode() {
@@ -20,6 +86,8 @@ public class Host implements Serializable
 				+ ((ipAddress == null) ? 0 : ipAddress.hashCode());
 		result = prime * result
 				+ ((macAddress == null) ? 0 : macAddress.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((nicName == null) ? 0 : nicName.hashCode());
 		return result;
 	}
 	@Override
@@ -45,78 +113,25 @@ public class Host implements Serializable
 				return false;
 		} else if (!macAddress.equals(other.macAddress))
 			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (nicName == null) {
+			if (other.nicName != null)
+				return false;
+		} else if (!nicName.equals(other.nicName))
+			return false;
 		return true;
 	}
-
-	private IpAddress ipAddress;
-	private MacAddress macAddress;
-	
-	public enum HostType
-	{
-		PC,
-		Gateway
-	}
-
-	// Properties //////////////////////////////////////////////////////////
-
-	public HostType getHostType() {
-		return deviceType;
-	}
-	public void setHostType(HostType hostType) {
-		this.deviceType = hostType;
-	}
-	public IpAddress getIpAddress() {
-		return ipAddress;
-	}
-	public void setIpAddress(IpAddress ipAddress) {
-		this.ipAddress = ipAddress;
-	}
-	public MacAddress getMacAddress() {
-		return macAddress;
-	}
-	public void setMacAddress(MacAddress hardwareAddress) {
-		this.macAddress = hardwareAddress;
-	}
-	public int getDeviceTypeImage() {
-		return deviceTypeImage;
-	}
-	public void setDeviceTypeImage(int deviceTypeImage) {
-		this.deviceTypeImage = deviceTypeImage;
-	}
-	// Constructors //////////////////////////////////////////////////////////
 	
 	
-	public Host()
-	{
-		setHostType(HostType.PC);
-		setIpAddress(new IpAddress());
-		setMacAddress(new MacAddress());
-	}
 	
-	public Host(IpAddress ip)
-	{
-		this();
-		setIpAddress(ip);
-	}
-	
-	
-	// Methods //////////////////////////////////////////////////////////
 	
 	
 	
 	
 }
 
-
-
-/*public boolean isAlive = false;
-public int position = 0;
-public int responseTime = 0; // ms
-public String hostName = null;
-public String nicVendor = "Unknown";
-public String os = "Unknown";
-public HashMap<Integer, String> services = null;
-public HashMap<Integer, String> banners = null;
-public ArrayList<Integer> portsOpen = null;
-public ArrayList<Integer> portsClosed = null;*/
    

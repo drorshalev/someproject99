@@ -38,8 +38,8 @@ public class HostListAdapter extends ArrayAdapter<Host>
 			TextView ip = (TextView) v.findViewById(R.id.ip_address);
 			TextView mac = (TextView) v.findViewById(R.id.mac_address);
 
-			ip.setText(host.getIpAddress().getAddress());
-			mac.setText(host.getMacAddress().getAddress());
+			ip.setText(host.getIpAddress());
+			mac.setText(host.getMacAddress());
 		}
 		
 		v.setTag(host);

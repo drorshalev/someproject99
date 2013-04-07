@@ -1,9 +1,15 @@
 package com.ibus.autowol.backend;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +18,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import jcifs.netbios.Name;
+import jcifs.netbios.NbtAddress;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -25,46 +34,197 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	private static final int NTHREDS = 10;
 	private final String TAG = "HostEnumerator";
 	private final static int[] DPORTS = { 139, 445, 22, 80 };
-	IpAddress networkStart;
-	IpAddress networkEnd;
-	IpAddress gatewayIp;
+	String networkStart;
+	String networkEnd;
+	String gatewayIp;
 	long netowrkSize;
 	List<OnHostSearchProgressListener> _hostSearchProgressListeners;
 	List<OnHostSearchCompleteListener> _hostSearchCompleteListener; 
 	
 	
 	public HostEnumerator(){}
-	public HostEnumerator(IpAddress networkStart, IpAddress networkEnd, IpAddress gatewayIp)
+	public HostEnumerator(String networkStart, String networkEnd, String gatewayIp)
 	{
 		this.networkStart = networkStart;
 		this.networkEnd = networkEnd;
 		this.gatewayIp = gatewayIp;
-		this.netowrkSize = networkEnd.toLong() - networkStart.toLong() + 1;
+		this.netowrkSize = IpAddress.getUnsignedLongFromString(networkEnd) - IpAddress.getUnsignedLongFromString(networkStart) + 1;
 		_hostSearchProgressListeners = new ArrayList<OnHostSearchProgressListener>();
 		_hostSearchCompleteListener = new ArrayList<OnHostSearchCompleteListener>(); 
 	}
 	
+	
+	
+	
+	private static final short   NETBIOS_UDP_PORT = 137;
+	
+	// NBT UDP PACKET: QUERY; REQUEST; UNICAST
+	private static final byte[]  NETBIOS_REQUEST  = 
+	{ 
+		(byte)0x82, (byte)0x28, (byte)0x0,  (byte)0x0,  (byte)0x0, 
+		(byte)0x1,  (byte)0x0,  (byte)0x0,  (byte)0x0,  (byte)0x0, 
+		(byte)0x0,  (byte)0x0,  (byte)0x20, (byte)0x43, (byte)0x4B, 
+		(byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, 
+		(byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, 
+		(byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, 
+		(byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, 
+		(byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, 
+		(byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, 
+		(byte)0x0,  (byte)0x0,  (byte)0x21, (byte)0x0,  (byte)0x1
+	};
+	
+	
+	public String GetNetbiosName(String ip)
+	{
+		InetAddress mAddress = null;
+		DatagramSocket mSocket = null;
+		try {
+			mAddress = InetAddress.getByName(ip);
+			mSocket    = new DatagramSocket();
+			mSocket.setSoTimeout( 200 );
+		} catch (UnknownHostException e1) 
+		{
+			Log.e("NBResolver", "UnknownHostException occured in GetNetbiosName", e1 );
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			Log.e("NBResolver", "SocketException occured in GetNetbiosName", e );
+		}
+		
+		byte[] 		   buffer  = new byte[128];
+		DatagramPacket packet  = new DatagramPacket( buffer, buffer.length, mAddress, NETBIOS_UDP_PORT );
+		DatagramPacket query   = new DatagramPacket( NETBIOS_REQUEST, NETBIOS_REQUEST.length, mAddress, NETBIOS_UDP_PORT );
+		String		   name    = null;
+		String		   address = mAddress.getHostAddress();
+		//Target 		   target  = null;
+
+		for( int i = 0; i < 3; i++ )
+		{				
+			try
+			{
+				mSocket.send(query);
+				mSocket.receive(packet);
+
+				byte[] data = packet.getData();
+
+				if( data != null && data.length >= 74 )
+				{
+					String response = new String(data, "ASCII" );
+
+					// i know this is horrible, but i really need only the netbios name
+					name = response.substring( 57, 73 ).trim();	
+					if(name == null)
+						name = "";
+
+					Log.i( "NETBIOS", address + " was resolved to " + name );
+
+					/*// update netbios cache
+					mArpReader.addNetBiosName( address, name );
+
+					// existing target
+					target = System.getTargetByAddress( address );
+					if( target != null )
+					{
+						target.setAlias( name );
+						sendEndpointUpdateNotification( );
+					}
+
+					break;*/
+				}						
+			}				
+			catch( SocketTimeoutException ste ) 
+			{ 		
+				// swallow timeout error
+			}
+			catch( IOException e )
+			{
+				Log.e("NBResolver", "IOException occured in GetNetbiosName", e );
+			}
+			finally
+			{
+				try
+				{
+					// send again a query
+					mSocket.send( query );
+				}
+				catch( Exception e )
+				{
+					// swallow error
+				}
+			}
+			
+			
+			int idd = 1;
+		}
+
+		mSocket.close();	
+		
+		
+		return "";
+	}
+	
+	
+	
+	
+	
 	@Override
 	protected Boolean doInBackground(Void... params) 
 	{
-		try {
-			InetAddress in = InetAddress.getByName("10.0.0.99");
-			
-			 if (in.isReachable(5000)) {
-				 Log.i("NetworkScanActivity", "host ping successfull"); 
-			 }
-			 else
-			 {
-				 Log.i("NetworkScanActivity", "host ping NOT successfull");
-			 }
-			
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		/*Arp arp = new Arp();
+		arp.ProcessFile();*/
+		
+		Ping.isReachable("10.0.0.30");
+		Ping.isReachable("10.0.0.8");
+		Ping.isReachable("10.0.0.5");
+		Ping.isReachable("10.0.0.1");
+		Ping.isReachable("10.0.0.25");
+		Ping.isReachable("10.0.0.138");
+		
+		GetNetbiosName("10.0.0.30");
+		GetNetbiosName("10.0.0.8");
+		GetNetbiosName("10.0.0.5");
+		GetNetbiosName("10.0.0.1");
+		GetNetbiosName("10.0.0.25");
+		GetNetbiosName("10.0.0.138");
+		
+		
+		//List<Host> h =Arp.EnumerateHosts();
+		
+		/*Ping.isReachable("10.0.0.30");
+		Ping.isReachable("10.0.0.8");
+		Ping.isReachable("10.0.0.5");
+		Ping.isReachable("10.0.0.1");
+		Ping.isReachable("10.0.0.25");
+		Ping.isReachable("10.0.0.138");
+		
+		
+		Netbios.GetHost("10.0.0.30");
+		Netbios.GetHost("10.0.0.8");
+		Netbios.GetHost("10.0.0.5");
+		Netbios.GetHost("10.0.0.1");
+		Netbios.GetHost("10.0.0.25");
+		Netbios.GetHost("10.0.0.138");
+		*/
+		
+		
+		//GetHost("10.0.0.1");
+		
+		
+		
+		
+		
+		
+		
+		/*Long start = networkStart.toLong();
+		Long end = networkEnd.toLong();
+	        
+		for (long i = start; i <= end; i++) 
+		{
+			IpAddress ip = new IpAddress(i);
+			Ping(ip.getAddress());
+	    }*/
+		
+		
+		Log.i("NetworkScanActivity", " ******** DONE ********************");
 		
 		return true;
 		
@@ -110,7 +270,7 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	{
 		if(host[0] != null)
 		{
-			Log.i(TAG, "updating list item for: " + host[0].getIpAddress().getAddress());
+			Log.i(TAG, "updating list item for: " + host[0].getIpAddress());
 		
 			for (OnHostSearchProgressListener listener : _hostSearchProgressListeners) 
 			{
@@ -155,9 +315,9 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	
 	public class HostEnumerationCallable implements Callable<Host> 
 	{
-		IpAddress _ipAddress;
+		String _ipAddress;
 		
-		public HostEnumerationCallable(IpAddress ipAddress)
+		public HostEnumerationCallable(String ipAddress)
 		{
 			_ipAddress = ipAddress;
 		}
@@ -168,22 +328,22 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 			return GetHost(_ipAddress);
 		}
 		
-		public Host GetHost(IpAddress addr) 
+		public Host GetHost(String addr) 
 		{
 			Host host = new Host();
 			host.setIpAddress(addr);
-			host.setHostType(HostType.PC);
+			host.setDeviceType(HostType.PC);
 			
-			Log.i(TAG, "interogating: " + host.getIpAddress().getAddress());
+			Log.i(TAG, "interogating: " + host.getIpAddress());
 			
 			try 
 			{
 				//check if PC is reachable with java's version of ping.  this is pretty unreliable but i suspect it may force 
 				//an update of the ARP table, and this table contains the mac addresses we need
-				InetAddress h = InetAddress.getByName(host.getIpAddress().getAddress());
+				InetAddress h = InetAddress.getByName(host.getIpAddress());
 				if (h.isReachable(500)) 
 			    {
-			        Log.e(TAG, "PC is reachable or pingable: " + host.getIpAddress().getAddress());
+			        Log.e(TAG, "PC is reachable or pingable: " + host.getIpAddress());
 			    }
 				else
 				{
@@ -193,8 +353,8 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 		            for (int i = 0; i < DPORTS.length; i++) 
 		            {
 	                    s.bind(null);
-	                    s.connect(new InetSocketAddress(host.getIpAddress().getAddress(), DPORTS[i]), 500);
-	                    Log.v(TAG, "found using TCP connect " + host.getIpAddress().getAddress() + " on port=" + DPORTS[i]);
+	                    s.connect(new InetSocketAddress(host.getIpAddress(), DPORTS[i]), 500);
+	                    Log.v(TAG, "found using TCP connect " + host.getIpAddress() + " on port=" + DPORTS[i]);
 		            }
 				}
 				
@@ -216,15 +376,15 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 		
 		private boolean SetMac(Host host)
 		{ 
-			MacAddress mac = new MacAddress(host.getIpAddress());
+			/*MacAddress2 mac = new MacAddress2(host.getIpAddress());
 			
 			//check if a mac was found in our ARP table for the ip address 
 	        if(!mac.isEmpty())
 	        {
-	            Log.i(TAG, String.format("PC found using ARP check. Address: %s. MAC: %s", host.getIpAddress().getAddress(), mac.getAddress()));
+	            Log.i(TAG, String.format("PC found using ARP check. Address: %s. MAC: %s", host.getIpAddress(), mac.getAddress()));
 	            host.setMacAddress(mac);
 	            return true;
-	        }
+	        }*/
 	        
 	        return false;
 		}

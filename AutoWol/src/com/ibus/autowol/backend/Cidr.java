@@ -10,7 +10,7 @@ import android.util.Log;
 
 public class Cidr 
 {
-	private static final String TAG = "CidrGenerator";
+	private static final String TAG = "Cidr";
     private static final String CMD_IP = " -f inet addr show %s";
     private static final String PTN_IP1 = "\\s*inet [0-9\\.]+\\/([0-9]+) brd [0-9\\.]+ scope global %s$";
     private static final String PTN_IP2 = "\\s*inet [0-9\\.]+ peer [0-9\\.]+\\/([0-9]+) scope global %s$"; // FIXME: Merge with PTN_IP1
@@ -32,26 +32,26 @@ public class Cidr
 		_cidr = DEFAULT_CIDR;
     }
 	
-	public Cidr(IpAddress netmaskIp)
+	public Cidr(String netmaskIp)
     {
 		SetCidr(netmaskIp);
     }
 	
     // Methods ///////////////////////////////////////////////
 	
-	public void SetCidr(IpAddress netmaskIp){
+	public void SetCidr(String netmaskIp){
 		_cidr = Cidr.getCidr(netmaskIp);
     }
 	
 	//sets the CIDR for the devices IP.  the CIDR is the number of bits which make up the host portion 
     //of an IP address.  for most home networks this will be 24 bits
-    public static int getCidr(IpAddress netmaskIp) 
+    public static int getCidr(String netmaskIp) 
     {
     	int cidr = DEFAULT_CIDR;
     	
-        if (!netmaskIp.isEmptyNetworkMask()) 
+        if (IpAddress.isValidNetworkMask(netmaskIp)) 
         {
-            cidr = IpToCidr(netmaskIp.getAddress());
+            cidr = IpToCidr(netmaskIp);
         } else {
             String match;
             // Running ip tools
