@@ -155,7 +155,7 @@ public class PCEnumerator extends AsyncTask<Void, Host, String>
 		
 		private boolean SetMac()
 		{ 
-			MacAddress mac = new MacAddress(host.getIpAddress());
+			MacAddress2 mac = new MacAddress2(host.getIpAddress());
 			
 			//check if a mac was found in our ARP table for the ip address 
             if(!mac.isEmpty())

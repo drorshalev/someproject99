@@ -5,7 +5,7 @@ import java.net.InetAddress;
 
 import android.os.AsyncTask;
 
-public class WOLManager extends AsyncTask<String, String, String>  
+public class WolGenerator extends AsyncTask<String, String, String>  
 {
 	public final int PORT = 9; 
 

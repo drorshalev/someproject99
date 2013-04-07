@@ -1,13 +1,8 @@
 package com.ibus.autowol.ui;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -52,7 +47,7 @@ public class NetworkScanActivity extends SherlockFragmentActivity implements OnH
 	{
 		super.onStart();
 		
-		int pbEnd =(int)(IpAddress.getUnsignedLongFromIp(NetInfo.network_end.getAddress()) - IpAddress.getUnsignedLongFromIp(NetInfo.network_start.getAddress()));
+		int pbEnd =(int)(IpAddress.getUnsignedLongFromString(NetInfo.network_end) - IpAddress.getUnsignedLongFromString(NetInfo.network_start));
 		ProgressBar pb = (ProgressBar) findViewById(R.id.network_scan_activity_progress_bar);
 		TextView pbText = (TextView) findViewById(R.id.network_scan_activity_progress_bar_text);
 		

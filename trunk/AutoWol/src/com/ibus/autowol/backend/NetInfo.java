@@ -28,11 +28,11 @@ public abstract class NetInfo
     private static final String TAG = "NetInfo";
     
     public static Nic deviceInterface;
-    public static IpAddress deviceIp;
-    public static IpAddress network_start;
-    public static IpAddress network_end;
-    public static IpAddress gatewayIp;
-    public static IpAddress netmaskIp;
+    public static String deviceIp;
+    public static String network_start;
+    public static String network_end;
+    public static String gatewayIp;
+    public static String netmaskIp;
     public static WifiInfo wifiConnectionInfo;
     public static Cidr cidr;    
     public static String carrier = null;
@@ -58,9 +58,9 @@ public abstract class NetInfo
         	{
                 NetworkInterface ni = en.nextElement();
                 String intfName = ni.getName();
-                IpAddress intfIp = getInterfaceFirstIp(ni);
+                String intfIp = getInterfaceFirstIp(ni);
                 
-                if (!intfIp.isEmptyIp()) 
+                if (IpAddress.isValidIp(intfIp)) 
                 {
                 	deviceInterface.setName(intfName);
                 	deviceInterface.setAddress(intfIp);
@@ -81,8 +81,8 @@ public abstract class NetInfo
         WifiManager wifi = (WifiManager) ctxt.getSystemService(Context.WIFI_SERVICE);
         if (wifi != null) {
         	wifiConnectionInfo = wifi.getConnectionInfo();
-        	gatewayIp = new IpAddress(wifi.getDhcpInfo().gateway);
-        	netmaskIp = new IpAddress(wifi.getDhcpInfo().netmask);
+        	gatewayIp = IpAddress.getStringFromIntSigned(wifi.getDhcpInfo().gateway);
+        	netmaskIp = IpAddress.getStringFromIntSigned(wifi.getDhcpInfo().netmask);
             return true;
         }
         return false;
@@ -91,7 +91,7 @@ public abstract class NetInfo
     
     private static void setHostBounds()
     {
-    	long numericDeviceIp = deviceInterface.getAddress().toLong(); 
+    	long numericDeviceIp = IpAddress.getUnsignedLongFromString(deviceInterface.getAddress()); 
     	
     	// Detected IP
         int shift = (32 - cidr.getCidr());
@@ -107,18 +107,16 @@ public abstract class NetInfo
         	end =  (start | ((1 << shift) - 1));
         }
         
-        network_start = new IpAddress(start);
-    	network_end = new IpAddress(end);
+        network_start = IpAddress.getStringFromLongUnsigned(start);
+    	network_end = IpAddress.getStringFromLongUnsigned(end);
     }
 
     
     
     /* UTILITIES 8888888888888888888888888888888888888888888888888888888888888888888888888888888888888 */
     
-    private static IpAddress getInterfaceFirstIp(NetworkInterface ni) 
+    private static String getInterfaceFirstIp(NetworkInterface ni) 
     {
-    	IpAddress ip = new IpAddress();
-    	
         if (ni != null) 
         {
             for (Enumeration<InetAddress> nis = ni.getInetAddresses(); nis.hasMoreElements();) 
@@ -132,12 +130,12 @@ public abstract class NetInfo
                         continue;
                     }
                     
-                    ip.setAddress(ia.getHostAddress());
+                    return ia.getHostAddress();
                 }
             }
         }
         
-        return ip;
+        return null;
     }
 
     
@@ -156,8 +154,8 @@ public abstract class NetInfo
     public static String getNetIp() 
     {
         int shift = (32 - cidr.getCidr());
-        int start = ((int) IpAddress.getUnsignedLongFromIp(deviceIp.getAddress()) >> shift << shift);
-        return IpAddress.getIpFromLongUnsigned((long) start);
+        int start = ((int) IpAddress.getUnsignedLongFromString(deviceIp) >> shift << shift);
+        return IpAddress.getStringFromLongUnsigned((long) start);
     }
 
     /*

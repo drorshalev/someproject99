@@ -3,7 +3,7 @@ package com.ibus.autowol.backend;
 public class Nic 
 {
 	private String _name;
-	private IpAddress _address;
+	private String _address;
 	
 	//
 	// Properties ////////////////////////////////////////////
@@ -14,10 +14,10 @@ public class Nic
 	public void setName(String _name) {
 		this._name = _name;
 	}
-	public IpAddress getAddress() {
+	public String getAddress() {
 		return _address;
 	}
-	public void setAddress(IpAddress address) {
+	public void setAddress(String address) {
 		_address = address;
 	}
 	
@@ -26,7 +26,6 @@ public class Nic
 	//
 	
 	public Nic(){
-		_address = new IpAddress();
 	}
 	
 
