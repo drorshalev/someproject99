@@ -13,14 +13,13 @@ public abstract class MacAddress
 {
 	private final static String TAG = "MacAddress";
 	private static final String NOMAC = "00:00:00:00:00:00";
-	
-	
+										 
 	public static boolean isValidMac(String macString)
 	{
 		if(macString == null)
 			return false;
 		
-		return !(macString == NOMAC);
+		return !(macString.equals(NOMAC));
 	}
 	
 	public static String getStringFromBytes(byte[] macBytes)
