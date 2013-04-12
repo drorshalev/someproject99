@@ -27,48 +27,47 @@ public abstract class Arp
 	public static List<Host> EnumerateHosts()
 	{
 		List<Host> hosts = new ArrayList<Host>();
+		BufferedReader bufferedReader = null;
 		
 		//String hw = NOMAC;
 		try 
 		{
-	        BufferedReader bufferedReader = new BufferedReader(new FileReader(arpFileLocation), BUF);
+	        bufferedReader = new BufferedReader(new FileReader(arpFileLocation), BUF);
 	        boolean firstLine = true;
 	        String line;
 	        
 	        while ((line = bufferedReader.readLine()) != null) 
 	        {
-	        	String[] parts = null;
-	        	
 	        	//skip first line as it only contains the header
 	        	if(!firstLine)
 	        	{
-	        		parts = line.split("\\s+");
+	        		String[] parts = line.split("\\s+");
 	        		
 	        		Host h = new Host();
 	        		h.setIpAddress(parts[0]);
 	        		h.setMacAddress(parts[3]);
 	        		h.setNicName(parts[5]);
+	        		
+	        		if(MacAddress.isValidMac(h.getMacAddress()))
+	        			hosts.add(h);
 	        	}
 	        	
-	        	
-	        	firstLine = false;
-	        	
-	            /*matcher = pattern.matcher(line);
-	            if (matcher.matches()) {
-	                hw = matcher.group(1);
-	                break;
-	            }*/
+	        	firstLine = false;	        	
 	        }
-	        bufferedReader.close();
 	    
-		    
 		} catch (IOException e) {
 		    Log.e(TAG, "Can't read Arp file: " + e.getMessage());
-		    
+		}
+		finally
+		{
+			try {
+				bufferedReader.close();
+			} catch (IOException e) {
+				Log.e(TAG, "IOException occured while attempting to close arp file" + e.getMessage());
+			}
 		}
 		
-		
-		return null;
+		return hosts;
 		
 	}
 	

@@ -1,43 +1,40 @@
 package com.ibus.autowol.backend;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import android.util.Log;
 
-public abstract class Ping 
+public abstract class InetAddressManager 
 {
-	public static boolean isReachable(String ipAddress)
+	private static final String TAG = "InetAddressManager";
+	
+	//this should get a pc name for an IP address regardless of whether InetAddress thinks it is reachable!!
+	public static String GetHostName(String ipAddress)
 	{
-		if(ipAddress == null)
-    		throw new IllegalArgumentException("ipAddress cannot be null");
-    	else if(!IpAddress.isValidIp(ipAddress))
-    		throw new IllegalArgumentException("ipAddress is not a valid ip address");
-		
-		Process p1;
+		String name = null;
 		try 
 		{
-			p1 = java.lang.Runtime.getRuntime().exec("ping -c 1 " + ipAddress);
-			int returnVal = p1.waitFor();
-			boolean reachable = (returnVal==0);
+			InetAddress in = InetAddress.getByName(ipAddress);
 			
-			if(reachable){
-				Log.i("HostEnumerator.Pinged", ipAddress +  " was pinged successfully");
-				return true;
-			}
+			name = in.getHostName();
+			if(name != null)
+				Log.i(TAG, "The host name of " + ipAddress + " was resolved to " + name + " using InetAddress");
 			else
-				Log.i("HostEnumerator", ipAddress +  " was NOT pinged successfully");
+				Log.i(TAG, "The host name of " + ipAddress + " could not be resolved using InetAddress");
 			
+		} catch (UnknownHostException e) {
+			Log.e(TAG, "an UnknownHostException occured while attempting to ping: " + ipAddress );
 		} catch (IOException e) {
-			Log.e("HostEnumerator", "an IOException occured while attempting to ping: " + ipAddress );
-		} catch (InterruptedException e) {
-			Log.e("HostEnumerator", "an InterruptedException occured while attempting to ping: " + ipAddress );
+			Log.e(TAG, "an IOException occured while attempting to ping: " + ipAddress );
 		}
-		
-		
-		return false;
-		
+			
+		return name;
 	}
 	
 	
+
 	/*this seems to work differently to the native ping available in a linux / windows console.  will fail on a windows host that has a a firewall up*/
 	/*public boolean javaPing(String ip)
 	{
@@ -67,5 +64,5 @@ public abstract class Ping
 	}*/
 	
 	
-	
+
 }

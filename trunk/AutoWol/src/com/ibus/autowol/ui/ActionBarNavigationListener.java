@@ -15,7 +15,6 @@ public class ActionBarNavigationListener implements ActionBar.OnNavigationListen
 	public ActionBarNavigationListener(SherlockFragmentActivity activity)
 	{
 		_activity = activity;
-		
 	}
 	
 	@Override

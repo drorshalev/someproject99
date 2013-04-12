@@ -6,7 +6,7 @@ import android.util.Log;
 
 import jcifs.netbios.NbtAddress;
 
-public abstract class Netbios 
+public abstract class Jcifs 
 {
 	//this will only work on pcs that have samaba / cifs enabled
 	public static Host GetHost(String ipAddress)
@@ -38,6 +38,18 @@ public abstract class Netbios
 		
 		return host;
 	}
+	
+	public static String getHostName(String ipAddress)
+	{
+		Host host = GetHost(ipAddress);
+		
+		if(host != null)
+			return host.getName();
+		
+		return null;
+	}
+	
+	
 	
 	
 	private static void throwOnIllegalIp(String ipAsString)
