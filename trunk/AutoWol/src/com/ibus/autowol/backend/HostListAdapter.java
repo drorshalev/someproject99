@@ -35,11 +35,13 @@ public class HostListAdapter extends ArrayAdapter<Host>
 		
 		if (host != null) 
 		{
-			TextView ip = (TextView) v.findViewById(R.id.ip_address);
-			TextView mac = (TextView) v.findViewById(R.id.mac_address);
+			TextView ip = (TextView) v.findViewById(R.id.host_list_item_ip_address);
+			TextView mac = (TextView) v.findViewById(R.id.host_list_item_mac_address);
+			TextView pcName = (TextView) v.findViewById(R.id.host_list_item_pc_name);
 
 			ip.setText(host.getIpAddress());
 			mac.setText(host.getMacAddress());
+			pcName.setText(host.getName());
 		}
 		
 		v.setTag(host);

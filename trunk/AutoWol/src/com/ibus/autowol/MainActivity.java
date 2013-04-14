@@ -10,7 +10,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.ibus.autowol.backend.NetInfo;
+import com.ibus.autowol.backend.Network;
 import com.ibus.autowol.ui.ActionBarNavigationListener;
 import com.ibus.autowol.ui.ActivityListItem;
 import com.ibus.autowol.ui.NavigationSpinnerAdapter;
@@ -30,7 +30,7 @@ public class MainActivity extends SherlockFragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        NetInfo.refresh(this);
+        Network.refresh(this);
         InitialiseActionBar();
     }
     
@@ -58,8 +58,6 @@ public class MainActivity extends SherlockFragmentActivity
         
         return true; 
     }
-    
-    
     
     @Override
     public boolean onOptionsItemSelected(MenuItem item) 

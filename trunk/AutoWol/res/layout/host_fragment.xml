@@ -5,11 +5,24 @@
     android:orientation="vertical" >
     
     
+    <Spinner
+         android:id="@+id/host_fragment_networks"
+         android:layout_width="fill_parent"
+         android:layout_height="50dp"
+         android:layout_marginLeft="5dp"
+         android:layout_marginRight="5dp"
+         android:layout_marginTop="5dp"
+         />
+    
      <ListView
         android:id="@+id/host_list"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1" >
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+         android:layout_marginRight="5dp"
+         android:layout_marginTop="5dp">
     </ListView>
+
+     
 
 </LinearLayout>

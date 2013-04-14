@@ -1,26 +1,13 @@
 package com.ibus.autowol.backend;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import jcifs.netbios.Name;
-import jcifs.netbios.NbtAddress;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -31,7 +18,7 @@ import com.ibus.autowol.ui.OnHostSearchProgressListener;
 
 public class HostEnumerator extends AsyncTask<Void, Host, Boolean> 
 {
-	private static final int NTHREDS = 10;
+	//private static final int NTHREDS = 10;
 	private final String TAG = "HostEnumerator";
 	private final static int[] DPORTS = { 139, 445, 22, 80 };
 	String networkStart;
@@ -52,9 +39,6 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 		_hostSearchProgressListeners = new ArrayList<OnHostSearchProgressListener>();
 		_hostSearchCompleteListener = new ArrayList<OnHostSearchCompleteListener>(); 
 	}
-	
-	
-	
 	
 	
 	
@@ -82,8 +66,10 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 					n = Jcifs.getHostName(h.getIpAddress());
 					
 				h.setName(n);
+				
+				publishProgress(h);
 			}
-			
+		
 		} catch (InterruptedException e) 
 		{
 			e.printStackTrace();
@@ -133,7 +119,15 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	@Override
 	protected void onProgressUpdate (Host... host)
 	{
-		if(host[0] != null)
+		Log.i(TAG, "updating list item for: " + host[0].getIpAddress());
+		
+		for (OnHostSearchProgressListener listener : _hostSearchProgressListeners) 
+		{
+			listener.onHostSearchProgress(host[0]);
+        }
+		
+		
+		/*if(host[0] != null)
 		{
 			Log.i(TAG, "updating list item for: " + host[0].getIpAddress());
 		
@@ -148,7 +142,7 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 			{
 				listener.onHostSearchProgress(null);
 	        }
-		}
+		}*/
 		
 	}
 	
@@ -237,9 +231,6 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	        */
 			return null;
 		}
-		
-		
-		
 	
 	}
 	

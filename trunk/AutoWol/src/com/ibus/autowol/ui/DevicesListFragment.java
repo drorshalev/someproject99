@@ -2,6 +2,7 @@ package com.ibus.autowol.ui;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,16 +10,22 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.ibus.autowol.R;
 import com.ibus.autowol.backend.Host;
+import com.ibus.autowol.backend.HostEnumerator;
 import com.ibus.autowol.backend.HostListAdapter;
+import com.ibus.autowol.backend.Network;
 import com.ibus.autowol.backend.Serialiser;
 
-public class DevicesListFragment extends SherlockFragment implements OnHostSearchProgressListener, PromptNetworkScanDialog.PromptNetworkScanDialogListener
+public class DevicesListFragment extends SherlockFragment implements OnHostSearchProgressListener, OnHostSearchCompleteListener
 {
 	HostListAdapter _adapter;
 	private ListClickListener listClickListener;
@@ -46,10 +53,10 @@ public class DevicesListFragment extends SherlockFragment implements OnHostSearc
 		    boolean doRefresh = extras.getBoolean("RefreshDeviceList");
 		    if(doRefresh)
 		    {*/
-		    	resetHostList();
+		    	//resetHostList();
 		    /*}
 		}*/
-	}
+	} 
 	
 	
 	
@@ -57,8 +64,9 @@ public class DevicesListFragment extends SherlockFragment implements OnHostSearc
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
+		listClickListener = new DeviceListClickListener((SherlockFragmentActivity)getActivity());
         View v = inflater.inflate(R.layout.host_fragment, container, false);
-        listClickListener = new DeviceListClickListener((SherlockFragmentActivity)getActivity());
+        
         return v;
     }
 	
@@ -67,55 +75,47 @@ public class DevicesListFragment extends SherlockFragment implements OnHostSearc
 	{
 		super.onActivityCreated(savedInstanceState);
 		
-        _adapter = new HostListAdapter(getActivity(), R.id.ip_address, new ArrayList<Host>());
+		//create network spinner
+		Spinner spiner = (Spinner) getActivity().findViewById(R.id.host_fragment_networks);
+        
+		List<NetworkListItem> ar = new ArrayList<NetworkListItem>();
+		ar.add(new NetworkListItem(Network.getNetworkName()));
+		
+		spiner.setAdapter(new NetworkSpinnerAdapter(ar, getActivity().getLayoutInflater()));
+		
+		//create host list 
+        _adapter = new HostListAdapter(getActivity(), R.id.host_list_item_ip_address, new ArrayList<Host>());
 		 
 		ListView listView = (ListView) getActivity().findViewById(R.id.host_list);
 		listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		listView.setOnItemClickListener(listClickListener); 
 		listView.setAdapter(_adapter);
 		
-		//resetHostList();
+		resetHostList();
 		
-		if(_adapter.GetItems().size() <= 0)
-			PromptNetworkScan();
+		/*if(_adapter.GetItems().size() <= 0)
+			PromptNetworkScan();*/
 	}
 	
-	
-	private void PromptNetworkScan()
-    {
-    	PromptNetworkScanDialog dlg = new PromptNetworkScanDialog();
-    	dlg.setCancelable(false);
-    	dlg.onAttach(this);
-    	dlg.show(((SherlockFragmentActivity)getActivity()).getSupportFragmentManager(), "PromptNetworkScanDialog");
-    }
 
-	
-	@Override
-	public void onPromptNetworkScanPositiveClick(DialogInterface dialog) 
+	public void resetHostList()
 	{
-		GoToNetworkScanActivity();
-	}
-	
-	@Override
-	public void onPromptNetworkScanNegativeClick(DialogInterface dialog) 
-	{
-	}
-	
-	public void GoToNetworkScanActivity()
-    {
-    	Intent intent = new Intent(getActivity(), NetworkScanActivity.class);
-        //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        getActivity().startActivity(intent);
-    }
-
-
-	public void ClearList()
-	{
+		//HashSet<Host> savedDevices = Serialiser.GetHosts((SherlockFragmentActivity)getActivity());
 		_adapter.clear();
-		_adapter.notifyDataSetChanged();
+		
+		HostEnumerator he = new HostEnumerator(Network.getNetworkStartIp(), Network.getNetworkEndIp(), Network.getGatewayIp());
+		he.addHostSearchProgressListener(this);
+		he.addHostSearchCompleteListener(this);
+		he.execute();
+		
+		/*if(devices != null)
+		{
+			_adapter.clear();
+			_adapter.addAll(savedDevices);
+			_adapter.notifyDataSetChanged();
+		}*/
 	}
-
-
+	
 	@Override
 	public void onHostSearchProgress(Host host) 
 	{
@@ -126,16 +126,56 @@ public class DevicesListFragment extends SherlockFragment implements OnHostSearc
 		}
 	}
 	
-	public void resetHostList()
+	
+	@Override
+	public void onSearchComplete() 
 	{
-		HashSet<Host> savedDevices = Serialiser.GetHosts((SherlockFragmentActivity)getActivity());
-		if(savedDevices != null)
-		{
-			_adapter.clear();
-			_adapter.addAll(savedDevices);
-			_adapter.notifyDataSetChanged();
-		}
+		/*ProgressBar pb = (ProgressBar) findViewById(R.id.network_scan_activity_progress_bar);
+		TextView pbText = (TextView) findViewById(R.id.network_scan_activity_progress_bar_text);
+		pbText.setText("Network Scan complete");
+		pb.setVisibility(View.GONE);*/
 	}
+	
+	
+	
+	
+	/*private void PromptNetworkScan()
+    {
+    	PromptNetworkScanDialog dlg = new PromptNetworkScanDialog();
+    	dlg.setCancelable(false);
+    	dlg.onAttach(this);
+    	dlg.show(((SherlockFragmentActivity)getActivity()).getSupportFragmentManager(), "PromptNetworkScanDialog");
+    }*/
+
+	
+	/*@Override
+	public void onPromptNetworkScanPositiveClick(DialogInterface dialog) 
+	{
+		GoToNetworkScanActivity();
+	}
+	
+	@Override
+	public void onPromptNetworkScanNegativeClick(DialogInterface dialog) 
+	{
+	}*/
+	
+	/*public void GoToNetworkScanActivity()
+    {
+    	Intent intent = new Intent(getActivity(), NetworkScanActivity.class);
+        //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        getActivity().startActivity(intent);
+    }*/
+
+
+	public void ClearList()
+	{
+		_adapter.clear();
+		_adapter.notifyDataSetChanged();
+	}
+
+
+	
+	
 	
 
 }

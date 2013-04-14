@@ -16,7 +16,7 @@ import com.ibus.autowol.R;
 import com.ibus.autowol.backend.Host;
 import com.ibus.autowol.backend.HostEnumerator;
 import com.ibus.autowol.backend.IpAddress;
-import com.ibus.autowol.backend.NetInfo;
+import com.ibus.autowol.backend.Network;
 
 public class NetworkScanActivity extends SherlockFragmentActivity implements OnHostSearchCompleteListener, OnHostSearchProgressListener
 {
@@ -47,7 +47,7 @@ public class NetworkScanActivity extends SherlockFragmentActivity implements OnH
 	{
 		super.onStart();
 		
-		int pbEnd =(int)(IpAddress.getUnsignedLongFromString(NetInfo.network_end) - IpAddress.getUnsignedLongFromString(NetInfo.network_start));
+		int pbEnd =(int)(IpAddress.getUnsignedLongFromString(Network.getNetworkEndIp()) - IpAddress.getUnsignedLongFromString(Network.getNetworkStartIp()));
 		ProgressBar pb = (ProgressBar) findViewById(R.id.network_scan_activity_progress_bar);
 		TextView pbText = (TextView) findViewById(R.id.network_scan_activity_progress_bar_text);
 		
@@ -56,7 +56,7 @@ public class NetworkScanActivity extends SherlockFragmentActivity implements OnH
 		pb.setProgress(0);
 	    pb.setVisibility(View.VISIBLE);
 		
-		HostEnumerator hostEnumerator = new HostEnumerator(NetInfo.network_start, NetInfo.network_end, NetInfo.gatewayIp);
+		HostEnumerator hostEnumerator = new HostEnumerator(Network.getNetworkStartIp(), Network.getNetworkEndIp(), Network.getGatewayIp());
 		hostEnumerator.addHostSearchProgressListener(_fragment);
 		hostEnumerator.addHostSearchProgressListener(this);
 		hostEnumerator.addHostSearchCompleteListener(this);
