@@ -38,7 +38,7 @@ public class NetworkScanFragment extends SherlockFragment implements OnHostSearc
 	{
 		super.onActivityCreated(savedInstanceState);
 		
-        _adapter = new HostListAdapter(getActivity(), R.id.ip_address, new ArrayList<Host>());
+        _adapter = new HostListAdapter(getActivity(), R.id.host_list_item_ip_address, new ArrayList<Host>());
 		 
 		ListView listView = (ListView) getActivity().findViewById(R.id.host_list);
 		listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);

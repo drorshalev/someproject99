@@ -1,6 +1,8 @@
 package com.ibus.autowol.ui;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import android.view.View;
 import android.widget.AdapterView;
@@ -11,6 +13,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.ibus.autowol.R;
+import com.ibus.autowol.backend.Host;
 
 
 /*
@@ -95,6 +98,22 @@ public abstract class ListClickListener implements AdapterView.OnItemClickListen
 			_selectedItems.clear();
 		}
 	};
+	
+	
+	@SuppressWarnings("unchecked")
+	public <T> List<T> GetItems() 
+	{
+		List<View> vl = new ArrayList<View>(_selectedItems);
+		List<T> ol = new ArrayList<T>();
+		
+		for(View v : vl){
+			ol.add((T)v.getTag());
+		}
+		
+		return ol;
+	}
+	
+	
 	
 	public abstract boolean actionItemClicked(ActionMode mode, MenuItem item);
 	
