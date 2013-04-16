@@ -11,16 +11,30 @@ public class Host implements Serializable
 		Gateway
 	}
 	private static final long serialVersionUID = 1L;
+	private int primaryKey;
 	private int deviceTypeImage;
 	private HostType deviceType;
 	private String ipAddress;
 	private String macAddress;
 	private String name;
-	private String nicName;
+	private String displayName;
+	private String nicVendor;
 	
 
 	// Properties //////////////////////////////////////////////////////////
 
+	public int getPrimaryKey() {
+		return primaryKey;
+	}
+	public void setPrimaryKey(int primaryKey) {
+		this.primaryKey = primaryKey;
+	}
+	public String getDisplayName() {
+		return displayName;
+	}
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
 	public HostType getDeviceType() {
 		return deviceType;
 	}
@@ -51,11 +65,11 @@ public class Host implements Serializable
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String getNicName() {
-		return nicName;
+	public String getNicVendor() {
+		return nicVendor;
 	}
-	public void setNicName(String nicName) {
-		this.nicName = nicName;
+	public void setNicVendor(String nicName) {
+		this.nicVendor = nicName;
 	}
 	
 	
@@ -66,6 +80,17 @@ public class Host implements Serializable
 	{
 		setDeviceType(HostType.PC);
 	}
+	
+	public Host(int primaryKey, String name, String displayName, String ipAddress, String  macAddress, String vendor)
+	{
+		setDeviceType(HostType.PC);
+		setName(name);
+		setDisplayName(displayName);
+		setIpAddress(ipAddress);
+		setMacAddress(macAddress);
+		setNicVendor(vendor);
+	}
+	
 	
 	public Host(String ip)
 	{
@@ -87,7 +112,7 @@ public class Host implements Serializable
 		result = prime * result
 				+ ((macAddress == null) ? 0 : macAddress.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((nicName == null) ? 0 : nicName.hashCode());
+		result = prime * result + ((nicVendor == null) ? 0 : nicVendor.hashCode());
 		return result;
 	}
 	@Override
@@ -118,10 +143,10 @@ public class Host implements Serializable
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
-		if (nicName == null) {
-			if (other.nicName != null)
+		if (nicVendor == null) {
+			if (other.nicVendor != null)
 				return false;
-		} else if (!nicName.equals(other.nicName))
+		} else if (!nicVendor.equals(other.nicVendor))
 			return false;
 		return true;
 	}
