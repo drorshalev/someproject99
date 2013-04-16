@@ -46,7 +46,7 @@ public abstract class Arp
 	        		Host h = new Host();
 	        		h.setIpAddress(parts[0]);
 	        		h.setMacAddress(parts[3]);
-	        		h.setNicName(parts[5]);
+	        		h.setNicVendor(parts[5]);
 	        		
 	        		if(MacAddress.isValidMac(h.getMacAddress()))
 	        			hosts.add(h);
