@@ -3,8 +3,8 @@ package com.ibus.autowol.test;
 import java.util.List;
 
 import com.ibus.autowol.backend.Database;
-import com.ibus.autowol.backend.Host;
-import com.ibus.autowol.backend.Host.HostType;
+import com.ibus.autowol.backend.Device;
+import com.ibus.autowol.backend.Router;
 
 import android.test.AndroidTestCase;
 
@@ -30,7 +30,7 @@ public class DatabaseTests extends AndroidTestCase {
         Database db = new Database(getContext());
         db.open();
                 
-        Host host = new Host();
+        Device host = new Device();
         host.setName("name");
         host.setDisplayName("displayName");
         host.setIpAddress("12.12.12.12");
@@ -39,7 +39,31 @@ public class DatabaseTests extends AndroidTestCase {
         
 		db.saveHost(host);
 		
-		List<Host> hl = db.getAllHosts();
+		List<Device> hl = db.getAllHosts();
+        
+		assertTrue(hl.size() > 0);
+		
+        db.close();
+	}
+	
+	
+	public void testSaveRouter()
+	{
+        Database db = new Database(getContext());
+        db.open();
+                
+        Router r = new Router();
+        r.setName("name");
+        r.setDisplayName("displayName");
+        r.setIpAddress("12.12.12.12");
+        r.setMacAddress("00:00:00:00:00:00");
+        r.setNicVendor("nicName");
+        r.setBssid("00:00:00:00:00:xx");
+        r.setSsid("Ssid");
+        
+		db.saveRouter(r);
+		
+		List<Router> hl = db.getAllRouters();
         
 		assertTrue(hl.size() > 0);
 		
@@ -50,3 +74,8 @@ public class DatabaseTests extends AndroidTestCase {
 	
 	
 }
+
+
+
+
+
