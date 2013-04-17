@@ -19,7 +19,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.ibus.autowol.R;
-import com.ibus.autowol.backend.Host;
+import com.ibus.autowol.backend.Device;
 import com.ibus.autowol.backend.HostEnumerator;
 import com.ibus.autowol.backend.HostListAdapter;
 import com.ibus.autowol.backend.Network;
@@ -84,7 +84,7 @@ public class DevicesListFragment extends SherlockFragment implements OnHostSearc
 		spiner.setAdapter(new NetworkSpinnerAdapter(ar, getActivity().getLayoutInflater()));
 		
 		//create host list 
-        _adapter = new HostListAdapter(getActivity(), R.id.host_list_item_ip_address, new ArrayList<Host>());
+        _adapter = new HostListAdapter(getActivity(), R.id.host_list_item_ip_address, new ArrayList<Device>());
 		 
 		ListView listView = (ListView) getActivity().findViewById(R.id.host_list);
 		listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -103,7 +103,7 @@ public class DevicesListFragment extends SherlockFragment implements OnHostSearc
 		//HashSet<Host> savedDevices = Serialiser.GetHosts((SherlockFragmentActivity)getActivity());
 		_adapter.clear();
 		
-		HostEnumerator he = new HostEnumerator(Network.getNetworkStartIp(), Network.getNetworkEndIp(), Network.getGatewayIp());
+		HostEnumerator he = new HostEnumerator();
 		he.addHostSearchProgressListener(this);
 		he.addHostSearchCompleteListener(this);
 		he.execute();
@@ -117,7 +117,7 @@ public class DevicesListFragment extends SherlockFragment implements OnHostSearc
 	}
 	
 	@Override
-	public void onHostSearchProgress(Host host) 
+	public void onHostSearchProgress(Device host) 
 	{
 		if(host != null)
 		{

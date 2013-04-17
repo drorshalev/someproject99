@@ -13,7 +13,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.ibus.autowol.MainActivity;
 import com.ibus.autowol.R;
-import com.ibus.autowol.backend.Host;
+import com.ibus.autowol.backend.Device;
 import com.ibus.autowol.backend.HostEnumerator;
 import com.ibus.autowol.backend.IpAddress;
 import com.ibus.autowol.backend.Network;
@@ -56,7 +56,7 @@ public class NetworkScanActivity extends SherlockFragmentActivity implements OnH
 		pb.setProgress(0);
 	    pb.setVisibility(View.VISIBLE);
 		
-		HostEnumerator hostEnumerator = new HostEnumerator(Network.getNetworkStartIp(), Network.getNetworkEndIp(), Network.getGatewayIp());
+		HostEnumerator hostEnumerator = new HostEnumerator();
 		hostEnumerator.addHostSearchProgressListener(_fragment);
 		hostEnumerator.addHostSearchProgressListener(this);
 		hostEnumerator.addHostSearchCompleteListener(this);
@@ -77,7 +77,7 @@ public class NetworkScanActivity extends SherlockFragmentActivity implements OnH
     }
 	
 	@Override
-	public void onHostSearchProgress(Host host) 
+	public void onHostSearchProgress(Device host) 
 	{
 		ProgressBar pb = (ProgressBar) findViewById(R.id.network_scan_activity_progress_bar);
 		pb.incrementProgressBy(1);

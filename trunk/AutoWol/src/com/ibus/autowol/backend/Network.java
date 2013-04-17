@@ -31,7 +31,7 @@ public abstract class Network
     private static String _networkEndIp;
     private static String _gatewayIp;
     private static String _netmaskIp;
-    private static Host _device;
+    private static Device _device;
     private static Cidr _cidr;    
     private static String _carrier = null;
     private static WifiInfo wifiInfo;
@@ -66,7 +66,7 @@ public abstract class Network
     //set ip of the device to the first valid ip found a network interface
     private static void setDevice() 
     {
-    	_device = new Host();
+    	_device = new Device();
         try 
         {
         	for (Enumeration<NetworkInterface> nics = NetworkInterface.getNetworkInterfaces(); nics.hasMoreElements();) 
@@ -131,7 +131,7 @@ public abstract class Network
 
     
     
-    public boolean IsGateway(String ipAddress)
+    public static boolean IsGateway(String ipAddress)
     {
     	if(ipAddress == null)
     		return false;

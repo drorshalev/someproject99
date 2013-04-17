@@ -24,9 +24,9 @@ public abstract class Arp
 		10.0.0.138       0x1         0x2         08:76:ff:02:7c:c0     *        wlan0
 		10.0.0.5         0x1         0x0         00:00:00:00:00:00     *        wlan0
 	*/
-	public static List<Host> EnumerateHosts()
+	public static List<Device> EnumerateHosts()
 	{
-		List<Host> hosts = new ArrayList<Host>();
+		List<Device> hosts = new ArrayList<Device>();
 		BufferedReader bufferedReader = null;
 		
 		//String hw = NOMAC;
@@ -43,7 +43,7 @@ public abstract class Arp
 	        	{
 	        		String[] parts = line.split("\\s+");
 	        		
-	        		Host h = new Host();
+	        		Device h = new Device();
 	        		h.setIpAddress(parts[0]);
 	        		h.setMacAddress(parts[3]);
 	        		h.setNicVendor(parts[5]);

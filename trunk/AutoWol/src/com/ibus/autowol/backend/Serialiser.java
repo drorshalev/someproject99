@@ -21,48 +21,48 @@ public abstract class Serialiser
 	private static final String _devicesFile = "devices.bin";
 	
 	
-	public static void AddHosts(HashSet<Host> hosts, SherlockFragmentActivity activity)
+	public static void AddHosts(HashSet<Device> hosts, SherlockFragmentActivity activity)
 	{
 		@SuppressWarnings("unchecked")
-		HashSet<Host> savedDevices = GetHosts(activity);
+		HashSet<Device> savedDevices = GetHosts(activity);
 		savedDevices.addAll(hosts);
 		
 		Serialise(savedDevices, _devicesFile, activity);
 	}
 	
-	public static void AddHosts(List<Host> hosts, SherlockFragmentActivity activity)
+	public static void AddHosts(List<Device> hosts, SherlockFragmentActivity activity)
 	{
 		@SuppressWarnings("unchecked")
-		HashSet<Host> savedDevices = GetHosts(activity);
+		HashSet<Device> savedDevices = GetHosts(activity);
 		savedDevices.addAll(hosts);
 		
 		Serialise(savedDevices, _devicesFile, activity);
 	}
 	
-	public static void DeleteHost(Host host, SherlockFragmentActivity activity)
+	public static void DeleteHost(Device host, SherlockFragmentActivity activity)
 	{
 		@SuppressWarnings("unchecked")
-		HashSet<Host> savedDevices = GetHosts(activity);
+		HashSet<Device> savedDevices = GetHosts(activity);
 		savedDevices.remove(host);
 		
 		Serialise(savedDevices, _devicesFile, activity);
 	}
 	
-	public static void AddHost(Host host, SherlockFragmentActivity activity)
+	public static void AddHost(Device host, SherlockFragmentActivity activity)
 	{
 		@SuppressWarnings("unchecked")
-		HashSet<Host> savedDevices = GetHosts(activity);
+		HashSet<Device> savedDevices = GetHosts(activity);
 		savedDevices.add(host);
 		
 		Serialise(savedDevices, _devicesFile, activity);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static HashSet<Host> GetHosts(SherlockFragmentActivity activity)
+	public static HashSet<Device> GetHosts(SherlockFragmentActivity activity)
 	{
-		HashSet<Host> hl = (HashSet<Host>)Serialiser.Deserialise(_devicesFile, activity);
+		HashSet<Device> hl = (HashSet<Device>)Serialiser.Deserialise(_devicesFile, activity);
 		if(hl == null)
-			hl = new HashSet<Host>();
+			hl = new HashSet<Device>();
 		
 		return hl;
 	}

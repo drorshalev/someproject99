@@ -2,8 +2,6 @@ package com.ibus.autowol.backend;
 
 import java.util.ArrayList;
 
-import com.ibus.autowol.backend.Host.HostType;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -23,7 +21,7 @@ public class Database {
 	  private static final String DATABASE_NAME = "AutoWol.db";
 	  	
 	  //
-	  // LOCATION TABLE
+	  // HOST TABLE
 	  //
 	  public static final String TABLE_HOST = "host";
 	  public static final String COLUMN_HOST_ID="host_id";
@@ -57,12 +55,52 @@ public class Database {
 	  public static final int ORDINAL_HOST_NIC_VENDOR = 5;
 	  
 	  
+	  //
+	  // ROUTER TABLE
+	  //
+	  public static final String TABLE_ROUTER = "router";
+	  public static final String COLUMN_ROUTER_ID="router_id";
+	  public static final String COLUMN_ROUTER_SSID="SSID"; //descriptive name of wifi hotspot
+	  public static final String COLUMN_ROUTER_IP="ip";
+	  public static final String COLUMN_ROUTER_MAC="mac";
+	  public static final String COLUMN_ROUTER_BSSID="bssid";
+	  public static final String COLUMN_ROUTER_NIC_VENDOR="nic_vendor";
+	  
+	  
+	  private static final String SQL_CREATE_TABLE_ROUTER = 
+		  "create table " 
+		  + TABLE_ROUTER 
+		  + " (" 
+		  + COLUMN_ROUTER_ID + " integer primary key autoincrement, " 
+		  + COLUMN_ROUTER_SSID + " text not null, "
+		  + COLUMN_ROUTER_IP + " text not null, "
+		  + COLUMN_ROUTER_MAC + " text not null, "
+		  + COLUMN_ROUTER_BSSID + " text, "
+		  + COLUMN_ROUTER_NIC_VENDOR +  " text"
+		  + ");";
+	  
+	  private static final String SQL_DROP_TABLE_ROUTER = "DROP TABLE IF EXISTS " + TABLE_ROUTER;
+	  
+	  
+	  public static final int ORDINAL_ROUTER_ID = 0;
+	  public static final int ORDINAL_ROUTER_SSID = 1;
+	  public static final int ORDINAL_ROUTER_IP = 2;
+	  public static final int ORDINAL_ROUTER_MAC = 3;
+	  public static final int ORDINAL_ROUTER_BSSID = 4;
+	  public static final int ORDINAL_ROUTER_NIC_VENDOR = 5;
+	  
+	  
 	  
 	  ////////////////////////////////////////////////////////////////////////////////////
 	  ////////////////////////////////////////////////////////////////////////////////////
 	  ////////////////////////////////////////////////////////////////////////////////////
 	  
+
+	  private static final String SQL_GET_All_HOSTS = 
+			  "select * from " + TABLE_HOST;
 	  
+	  private static final String SQL_GET_All_ROUTERS = 
+			  "select * from " + TABLE_ROUTER;
 	  
 	  
 	 /* public static final int INDEX_LOCATION_ID = 0;
@@ -127,8 +165,6 @@ public class Database {
 	  //SQL STATEMENTS
 	  //
 	  
-	  private static final String SQL_GET_All_HOSTS = 
-			  "select * from " + TABLE_HOST;
 	  
 	  
 	 /* private static final String SQL_GET_ALERT =
@@ -209,7 +245,7 @@ public class Database {
 	  }
 	  
 	  
-	  public int saveHost(Host host)
+	  public int saveHost(Device host)
 	  {
 		  ContentValues contentValues = new ContentValues();
 		  contentValues.put(COLUMN_HOST_NAME, host.getName());
@@ -222,26 +258,26 @@ public class Database {
 	  }
 	  
 	  
-	  public ArrayList<Host> getAllHosts() 
+	  public ArrayList<Device> getAllHosts() 
 	  {
 		  
-		  ArrayList<Host> pal = new ArrayList<Host>();
+		  ArrayList<Device> pal = new ArrayList<Device>();
 		  Cursor cursor = db.rawQuery(SQL_GET_All_HOSTS, null);
 		  
 		  if(cursor.moveToFirst())
 		  {
 			do {
-				  pal.add(
-						new Host(
-								cursor.getInt(ORDINAL_HOST_ID),
-								cursor.getString(ORDINAL_HOST_NAME),
-								cursor.getString(ORDINAL_HOST_DISPLAY_NAME),
-								cursor.getString(ORDINAL_HOST_IP),
-								cursor.getString(ORDINAL_HOST_MAC),
-								cursor.getString(ORDINAL_HOST_NIC_VENDOR)
-								)
-				  );
-		  	} while(cursor.moveToNext());
+				Device h = new Device();
+				h.setPrimaryKey(cursor.getInt(ORDINAL_HOST_ID));
+				h.setName(cursor.getString(ORDINAL_HOST_NAME));
+				h.setDisplayName(cursor.getString(ORDINAL_HOST_DISPLAY_NAME));
+				h.setIpAddress(cursor.getString(ORDINAL_HOST_IP));
+				h.setMacAddress(cursor.getString(ORDINAL_HOST_MAC));
+				h.setNicVendor(cursor.getString(ORDINAL_HOST_NIC_VENDOR));
+				
+				pal.add(h);
+		  	} 
+			while(cursor.moveToNext());
 			  
 		  }
 		  cursor.close();
@@ -250,8 +286,74 @@ public class Database {
 	  }
 	  
 	  
+	  public int saveRouter(Router host)
+	  {
+		  ContentValues contentValues = new ContentValues();
+		  
+		  contentValues.put(COLUMN_ROUTER_SSID, host.getName());
+		  contentValues.put(COLUMN_ROUTER_IP, host.getIpAddress());
+		  contentValues.put(COLUMN_ROUTER_MAC, host.getMacAddress());
+		  contentValues.put(COLUMN_ROUTER_BSSID, host.getBssid());
+		  contentValues.put(COLUMN_ROUTER_NIC_VENDOR, host.getNicVendor());
+		  
+		  return (int)db.insert(TABLE_ROUTER, null, contentValues);
+	  }
 	  
 	  
+	  public ArrayList<Router> getAllRouters() 
+	  {
+		  
+		  ArrayList<Router> pal = new ArrayList<Router>();
+		  Cursor cursor = db.rawQuery(SQL_GET_All_ROUTERS, null);
+		  
+		  if(cursor.moveToFirst())
+		  {
+			do {
+				
+				Router h = new Router();
+				h.setPrimaryKey(cursor.getInt(ORDINAL_ROUTER_ID));
+				h.setName(cursor.getString(ORDINAL_ROUTER_SSID));
+				h.setIpAddress(cursor.getString(ORDINAL_ROUTER_IP));
+				h.setMacAddress(cursor.getString(ORDINAL_ROUTER_MAC));
+				h.setBssid(cursor.getString(ORDINAL_ROUTER_BSSID));
+				h.setNicVendor(cursor.getString(ORDINAL_ROUTER_NIC_VENDOR));
+				
+				pal.add(h);
+		  	} 
+			while(cursor.moveToNext());
+			  
+		  }
+		  cursor.close();
+			
+		  return pal;
+		  
+		  
+	  }
+	  
+	  
+	  /*
+	  private private IsValidDevice(Host device)
+	  {
+		  
+		  
+		  
+		  private static final String SQL_CREATE_TABLE_HOST = 
+				  "create table " 
+				  + TABLE_HOST 
+				  + " (" 
+				  + COLUMN_HOST_ID + " integer primary key autoincrement, " 
+				  + COLUMN_HOST_NAME + " text, "
+				  + COLUMN_HOST_DISPLAY_NAME + " text, "
+				  + COLUMN_HOST_IP + " text not null, "
+				  + COLUMN_HOST_MAC + " text not null, "
+				  + COLUMN_HOST_NIC_VENDOR +  " text"
+				  + ");";
+		  
+		  
+		  return device.
+		  
+	  }
+	  */
 	  
 	 /* 
 	  *//**
@@ -422,100 +524,11 @@ public class Database {
 	  // PRIVATE METHODS /////////////////////////////////////////////////////////
 	  //
 	  
-	  private Cursor getLocationCursor(int locationId) {
-		  String[] params = {((Integer)locationId).toString()};
-		  return db.rawQuery(SQL_GET_LOCATION, params);
-	  }
-	  
-	  private ProximityAlert getLocation(int locationId) {
-		  return getLocation(locationId, false);
-	  }
-	  
-	  private ProximityAlert getLocation(int locationId, boolean getShallow) {
-		  Cursor c = getLocationCursor(locationId);
-		  ProximityAlert pa = null;
-		  
-		  if(c.moveToFirst()){
-			  
-			  ArrayList<ZoneAction> za = new ArrayList<ZoneAction>();
-			  if(!getShallow)
-				  za = getActionsForLocation(c.getInt(INDEX_LOCATION_ID));
-				  
-			  pa = new ProximityAlert(
-					c.getInt(INDEX_LOCATION_ID),
-					c.getString(INDEX_NAME),
-					c.getString(INDEX_LATITUDE),
-					c.getString(INDEX_LONGTITUDE),
-					c.getString(INDEX_ACCURACY),
-					c.getInt(INDEX_ENABLED),
-					za); //could be dodgy: multiple cursors open at same time
-		  }
-		  c.close();
-			
-		  return pa;
-	  }
-	  
+	
+	
 	
 	  
-	  
-	  private Cursor getActionsForLocationCursor(int locationId) {
-		  String[] params = {((Integer)locationId).toString()};
-		  return db.rawQuery(SQL_GET_ACTION_FOR_LOCATION, params);
-	  }
-	  private ArrayList<ZoneAction> getActionsForLocation(int locationId) {
-		  Cursor c = getActionsForLocationCursor(locationId);
-		  ArrayList<ZoneAction> za = new ArrayList<ZoneAction>();
-		  
-		  if (c.moveToFirst()) {
-				do {
-						za.add(
-							new ZoneAction(
-								c.getInt(INDEX_ACTION_ID),
-								c.getInt(INDEX_ENTERING_ZONE),
-								c.getInt(INDEX_LEAVING_ZONE),
-								getPluginsForAction(c.getInt(INDEX_ACTION_ID))
-							)
-						);
-					
-				} while(c.moveToNext());
-			}
-		  
-		  c.close();
-		  
-		  return za;
-	  }
-	  
-	  
-	  private Cursor getPluginsForActionCursor(int actionId) {
-		  String[] params = {((Integer)actionId).toString()};
-		  return db.rawQuery(SQL_GET_PLUGIN_FOR_ACTION, params);
-	  }
-	  private ArrayList<Plugin> getPluginsForAction(int actionId) {
-		  
-		  Cursor c = getPluginsForActionCursor(actionId);
-		  ArrayList<Plugin> pi = new ArrayList<Plugin>();
-		  
-		  if (c.moveToFirst()) {
-				do {
-					pi.add(
-							new Plugin(
-								c.getInt(INDEX_PLUGIN_ID),
-								c.getString(INDEX_PACKAGE_NAME),
-								c.getString(INDEX_ACTIVITY_NAME),
-								c.getString(INDEX_LABEL),
-								null
-							)
-						);
-					
-				} while(c.moveToNext());
-			}
-		  
-		  c.close();
-		  
-		  return pi;
-	  }
-	  
-	  
+	 
 	 
 	  private int UpdateLocationRow(ProximityAlert alert)
 	  {
@@ -530,41 +543,6 @@ public class Database {
 		  return db.update(TABLE_LOCATION, contentValues, COLUMN_LOCATION_ID +"=?", params);
 	  }
 	  
-	  
-	  private int AddLocationRow(ProximityAlert alert)
-	  {
-		  ContentValues contentValues = new ContentValues();
-		  contentValues.put(COLUMN_NAME, alert.name);
-		  contentValues.put(COLUMN_LATITUDE, alert.latitude);
-		  contentValues.put(COLUMN_LONGTITUDE, alert.longtitude);
-		  contentValues.put(COLUMN_ACCURACY, alert.radius);
-		  contentValues.put(COLUMN_ENABLED, alert.enabled);
-		  
-		  return (int)db.insert(TABLE_LOCATION, null, contentValues);
-	  }
-	  
-	  
-	  private int AddActionRow(ZoneAction action, int locationId)
-	  {
-		  ContentValues contentValues = new ContentValues();
-		  contentValues.put(COLUMN_ENTERING_ZONE, action.entering_zone);
-		  contentValues.put(COLUMN_LEAVING_ZONE, action.leaving_zone);
-		  contentValues.put(COLUMN_LOCATION_FK, locationId);
-		  
-		  return (int)db.insert(TABLE_ACTION, null, contentValues);
-	  }
-	  
-	  
-	  private int AddPluginRow(Plugin plugin, int actionId)
-	  {
-		  ContentValues contentValues = new ContentValues();
-		  contentValues.put(COLUMN_PACKAGE_NAME, plugin.packageName);
-		  contentValues.put(COLUMN_ACTIVITY_NAME, plugin.activityName);
-		  contentValues.put(COLUMN_LABEL, plugin.label);
-		  contentValues.put(COLUMN_ACTION_FK, actionId);
-		  
-		  return (int)db.insert(TABLE_PLUGIN, null, contentValues);
-	  }
 	  
 	  */
 	  
@@ -586,14 +564,10 @@ public class Database {
 		    public void onCreate(SQLiteDatabase _db) 
 		    {
 		    	_db.execSQL(SQL_CREATE_TABLE_HOST);
+		    	_db.execSQL(SQL_CREATE_TABLE_ROUTER);
 		    	
-				/*_db.execSQL(SQL_CREATE_LOCATION_TABLE);
-				_db.execSQL(SQL_CREATE_ACTION_TABLE);
-				_db.execSQL(SQL_CREATE_PLUGIN_TABLE);
-				
 				//create cascade delete triggers
-				_db.execSQL(SQL_ACTION_DELETE);
-				_db.execSQL(SQL_LOCATION_DELETE);*/
+				/*_db.execSQL(SQL_LOCATION_DELETE);*/
 		    }
 		    
 		    
@@ -602,19 +576,14 @@ public class Database {
 		    // the version of the database on disk needs to be upgraded to
 		    // the current version.
 		    @Override
-		    public void onUpgrade(SQLiteDatabase _db, int _oldVersion,
-		                           int _newVersion) {
+		    public void onUpgrade(SQLiteDatabase _db, int _oldVersion, int _newVersion) 
+		    {
 		      
 		    	_db.execSQL(SQL_DROP_TABLE_HOST);
+		    	_db.execSQL(SQL_DROP_TABLE_ROUTER);
 		    	
-		    	
-		      /*_db.execSQL("DROP TABLE IF EXISTS " + TABLE_PLUGIN);
-		      _db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTION);
-		      _db.execSQL("DROP TABLE IF EXISTS " + TABLE_LOCATION);
-		      
 		      //drop cascade delete triggers
-		      _db.execSQL("DROP TRIGGER IF EXISTS " + TRIG_ACTION_DELETE);
-		      _db.execSQL("DROP TRIGGER IF EXISTS " + TRIG_LOCATION_DELETE);*/
+		      //_db.execSQL("DROP TRIGGER IF EXISTS " + TRIG_ACTION_DELETE);
 		      
 		      // Create a new db.
 		      onCreate(_db);

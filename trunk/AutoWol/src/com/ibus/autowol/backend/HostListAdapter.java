@@ -11,11 +11,11 @@ import android.widget.TextView;
 
 import com.ibus.autowol.R;
 
-public class HostListAdapter extends ArrayAdapter<Host> 
+public class HostListAdapter extends ArrayAdapter<Device> 
 {
-	private List<Host> _objects;
+	private List<Device> _objects;
 
-	public HostListAdapter(Context context, int textViewResourceId, List<Host> objects) 
+	public HostListAdapter(Context context, int textViewResourceId, List<Device> objects) 
 	{
 		super(context, textViewResourceId, objects);
 		this._objects = objects;
@@ -31,7 +31,7 @@ public class HostListAdapter extends ArrayAdapter<Host>
 			v = inflater.inflate(R.layout.host_list_item, null);
 		}
 
-		Host host = _objects.get(position); 
+		Device host = _objects.get(position); 
 		
 		if (host != null) 
 		{
@@ -48,7 +48,7 @@ public class HostListAdapter extends ArrayAdapter<Host>
 		return v;
 	}
 	
-	public List<Host> GetItems()
+	public List<Device> GetItems()
 	{
 		return _objects;
 	}

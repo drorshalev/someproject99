@@ -8,34 +8,25 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-
 import android.os.AsyncTask;
 import android.util.Log;
-
-import com.ibus.autowol.backend.Host.HostType;
 import com.ibus.autowol.ui.OnHostSearchCompleteListener;
 import com.ibus.autowol.ui.OnHostSearchProgressListener;
 
-public class HostEnumerator extends AsyncTask<Void, Host, Boolean> 
+public class HostEnumerator extends AsyncTask<Void, Device, Boolean> 
 {
 	//private static final int NTHREDS = 10;
 	private final String TAG = "HostEnumerator";
 	private final static int[] DPORTS = { 139, 445, 22, 80 };
-	String networkStart;
-	String networkEnd;
-	String gatewayIp;
 	long netowrkSize;
 	List<OnHostSearchProgressListener> _hostSearchProgressListeners;
 	List<OnHostSearchCompleteListener> _hostSearchCompleteListener; 
 	
 	
-	public HostEnumerator(){}
-	public HostEnumerator(String networkStart, String networkEnd, String gatewayIp)
+	public HostEnumerator()
 	{
-		this.networkStart = networkStart;
-		this.networkEnd = networkEnd;
-		this.gatewayIp = gatewayIp;
-		this.netowrkSize = IpAddress.getUnsignedLongFromString(networkEnd) - IpAddress.getUnsignedLongFromString(networkStart) + 1;
+		this.netowrkSize = IpAddress.getUnsignedLongFromString(Network.getNetworkEndIp()) 
+				- IpAddress.getUnsignedLongFromString(Network.getNetworkStartIp()) + 1;
 		_hostSearchProgressListeners = new ArrayList<OnHostSearchProgressListener>();
 		_hostSearchCompleteListener = new ArrayList<OnHostSearchCompleteListener>(); 
 	}
@@ -45,9 +36,9 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	@Override
 	protected Boolean doInBackground(Void... params) 
 	{
-		Long start = IpAddress.getUnsignedLongFromString(networkStart);
-		Long end = IpAddress.getUnsignedLongFromString(networkEnd);
-		List<Host> hosts = null;
+		Long start = IpAddress.getUnsignedLongFromString(Network.getNetworkStartIp());
+		Long end = IpAddress.getUnsignedLongFromString(Network.getNetworkEndIp());
+		List<Device> hosts = null;
 		try 
 		{
 			for (long i = start; i <= end; i++) 
@@ -59,7 +50,7 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 			
 			hosts = Arp.EnumerateHosts();
 			
-			for(Host h : hosts)
+			for(Device h : hosts)
 			{
 				String n = InetAddressManager.GetHostName(h.getIpAddress());
 				if(n == null)
@@ -117,7 +108,7 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	}	
 	
 	@Override
-	protected void onProgressUpdate (Host... host)
+	protected void onProgressUpdate (Device... host)
 	{
 		Log.i(TAG, "updating list item for: " + host[0].getIpAddress());
 		
@@ -172,7 +163,7 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 	// HostEnumerationCallable /////////////////////////////////////////////////////////////////////////
 	///
 	
-	public class HostEnumerationCallable implements Callable<Host> 
+	public class HostEnumerationCallable implements Callable<Device> 
 	{
 		String _ipAddress;
 		
@@ -182,16 +173,20 @@ public class HostEnumerator extends AsyncTask<Void, Host, Boolean>
 		}
 		
 		
-		public Host call() throws Exception 
+		public Device call() throws Exception 
 		{
 			return GetHost(_ipAddress);
 		}
 		
-		public Host GetHost(String addr) 
+		public Device GetHost(String addr) 
 		{
-			Host host = new Host();
+			Device host;
+			if(Network.IsGateway(addr))
+				host = new Router();
+			else
+				host = new Device();
+			
 			host.setIpAddress(addr);
-			host.setDeviceType(HostType.PC);
 			
 			Log.i(TAG, "interogating: " + host.getIpAddress());
 			

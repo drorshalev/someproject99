@@ -9,11 +9,11 @@ import jcifs.netbios.NbtAddress;
 public abstract class Jcifs 
 {
 	//this will only work on pcs that have samaba / cifs enabled
-	public static Host GetHost(String ipAddress)
+	public static Device GetHost(String ipAddress)
 	{
 		throwOnIllegalIp(ipAddress);
 		
-		Host host = null;
+		Device host = null;
 		try 
 		{
 			NbtAddress[] nbEntry = NbtAddress.getAllByAddress(ipAddress);
@@ -22,7 +22,7 @@ public abstract class Jcifs
 			{
 				if(!nbEntry[i].isGroupAddress())
 				{
-					host = new Host();
+					host = new Device();
 					host.setIpAddress(ipAddress);
 					host.setName(nbEntry[i].getHostName());
 					host.setMacAddress(MacAddress.getStringFromBytes(nbEntry[i].getMacAddress()));
@@ -41,7 +41,7 @@ public abstract class Jcifs
 	
 	public static String getHostName(String ipAddress)
 	{
-		Host host = GetHost(ipAddress);
+		Device host = GetHost(ipAddress);
 		
 		if(host != null)
 			return host.getName();
