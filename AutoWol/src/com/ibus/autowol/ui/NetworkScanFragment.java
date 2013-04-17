@@ -11,7 +11,7 @@ import android.widget.ListView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.ibus.autowol.R;
-import com.ibus.autowol.backend.Host;
+import com.ibus.autowol.backend.Device;
 import com.ibus.autowol.backend.HostListAdapter;
 
 public class NetworkScanFragment extends SherlockFragment implements OnHostSearchProgressListener
@@ -38,7 +38,7 @@ public class NetworkScanFragment extends SherlockFragment implements OnHostSearc
 	{
 		super.onActivityCreated(savedInstanceState);
 		
-        _adapter = new HostListAdapter(getActivity(), R.id.host_list_item_ip_address, new ArrayList<Host>());
+        _adapter = new HostListAdapter(getActivity(), R.id.host_list_item_ip_address, new ArrayList<Device>());
 		 
 		ListView listView = (ListView) getActivity().findViewById(R.id.host_list);
 		listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -48,7 +48,7 @@ public class NetworkScanFragment extends SherlockFragment implements OnHostSearc
 	
 
 	@Override
-	public void onHostSearchProgress(Host host) 
+	public void onHostSearchProgress(Device host) 
 	{
 		if(host != null)
 		{

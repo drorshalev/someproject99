@@ -11,7 +11,7 @@ import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.MenuItem;
 import com.ibus.autowol.MainActivity;
 import com.ibus.autowol.R;
-import com.ibus.autowol.backend.Host;
+import com.ibus.autowol.backend.Device;
 import com.ibus.autowol.backend.Serialiser;
 
 public class NetworkScanListClickListener extends ListClickListener
@@ -28,9 +28,9 @@ public class NetworkScanListClickListener extends ListClickListener
 		if(item.getItemId() == R.id.add_host)
 		{
 			List<View> vl = new ArrayList<View>(_selectedItems);
-			List<Host> hl = new ArrayList<Host>();
+			List<Device> hl = new ArrayList<Device>();
 			for(View v : vl){
-				hl.add((Host)v.getTag());
+				hl.add((Device)v.getTag());
 			}
 			
 			Serialiser.AddHosts(hl, _activity);

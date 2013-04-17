@@ -6,7 +6,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.MenuItem;
 import com.ibus.autowol.R;
-import com.ibus.autowol.backend.Host;
+import com.ibus.autowol.backend.Device;
 
 public class DeviceListClickListener extends ListClickListener
 {
@@ -25,7 +25,7 @@ public class DeviceListClickListener extends ListClickListener
 		}
 		else if(item.getItemId() == R.id.device_list_context_menu_wake)
 		{
-			List<Host> hosts = GetItems();
+			List<Device> hosts = GetItems();
 		}
 			
 		
