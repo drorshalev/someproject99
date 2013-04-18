@@ -8,8 +8,10 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+
 import android.os.AsyncTask;
 import android.util.Log;
+
 import com.ibus.autowol.ui.OnHostSearchCompleteListener;
 import com.ibus.autowol.ui.OnHostSearchProgressListener;
 
