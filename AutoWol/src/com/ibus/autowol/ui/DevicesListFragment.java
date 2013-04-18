@@ -13,46 +13,33 @@ import android.widget.Spinner;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.ibus.autowol.R;
+import com.ibus.autowol.backend.Database;
 import com.ibus.autowol.backend.Device;
 import com.ibus.autowol.backend.HostEnumerator;
 import com.ibus.autowol.backend.HostListAdapter;
 import com.ibus.autowol.backend.Network;
+import com.ibus.autowol.backend.Router;
 
 public class DevicesListFragment extends SherlockFragment implements OnHostSearchProgressListener, OnHostSearchCompleteListener
 {
 	HostListAdapter _adapter;
 	private ListClickListener listClickListener;
 	boolean isCreating = false;
+	Database database;
+	private int currentNetworkRouterId;
 	
 	public DevicesListFragment()
 	{
+		
 	}
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
 	{
+		database = new Database(getActivity());
 		super.onCreate(savedInstanceState);
 	}
-	
-	@Override
-	public void onResume() 
-	{
-		super.onResume();
-		
-		/*Bundle extras = getActivity().getIntent().getExtras();
-		
-		if (extras != null) 
-		{
-		    boolean doRefresh = extras.getBoolean("RefreshDeviceList");
-		    if(doRefresh)
-		    {*/
-		    	//resetHostList();
-		    /*}
-		}*/
-	} 
-	
-	
-	
+
 	
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
@@ -69,12 +56,14 @@ public class DevicesListFragment extends SherlockFragment implements OnHostSearc
 		super.onActivityCreated(savedInstanceState);
 		
 		//create network spinner
-		Spinner spiner = (Spinner) getActivity().findViewById(R.id.host_fragment_networks);
+		/*Spinner spiner = (Spinner) getActivity().findViewById(R.id.host_fragment_networks);
         
 		List<NetworkListItem> ar = new ArrayList<NetworkListItem>();
-		ar.add(new NetworkListItem(Network.getNetworkName()));
+		ar.add(new NetworkListItem(Network.getRouter().getSsid()));
 		
-		spiner.setAdapter(new NetworkSpinnerAdapter(ar, getActivity().getLayoutInflater()));
+		spiner.setAdapter(new NetworkSpinnerAdapter(ar, getActivity().getLayoutInflater()));*/
+		
+		
 		
 		//create host list 
         _adapter = new HostListAdapter(getActivity(), R.id.host_list_item_ip_address, new ArrayList<Device>());
@@ -85,28 +74,50 @@ public class DevicesListFragment extends SherlockFragment implements OnHostSearc
 		listView.setAdapter(_adapter);
 		
 		resetHostList();
-		
-		/*if(_adapter.GetItems().size() <= 0)
-			PromptNetworkScan();*/
 	}
 	
 
+	@Override
+	public void onResume() 
+	{
+		super.onResume();
+		
+	} 
+	
+	
+	
+	
 	public void resetHostList()
 	{
-		//HashSet<Host> savedDevices = Serialiser.GetHosts((SherlockFragmentActivity)getActivity());
+		database.open();
+		
+		//get or create router 
+		Router r = database.getRouterForMac(Network.getRouter().getMacAddress());
+		if(r ==null)
+			currentNetworkRouterId = database.saveRouter(Network.getRouter());
+		else
+			currentNetworkRouterId = r.getPrimaryKey();
+		
+		//get all routers into our spinner
+		Spinner spiner = (Spinner) getActivity().findViewById(R.id.host_fragment_networks);
+        
+		List<Router> rl = database.getAllRouters();
+		spiner.setAdapter(new NetworkSpinnerAdapter(rl, getActivity().getLayoutInflater()));
+		
+		database.close();
+		
+		//select the router of our current network
+		int pos = _adapter.GetPositionForMac(Network.getRouter().getMacAddress());
+		if(pos != -1)
+			spiner.setSelection(pos);
+		
+		//reset the devices list for our network
 		_adapter.clear();
 		
 		HostEnumerator he = new HostEnumerator();
 		he.addHostSearchProgressListener(this);
 		he.addHostSearchCompleteListener(this);
-		he.execute();
-		
-		/*if(devices != null)
-		{
-			_adapter.clear();
-			_adapter.addAll(savedDevices);
-			_adapter.notifyDataSetChanged();
-		}*/
+		he.execute();		
 	}
 	
 	@Override
@@ -123,10 +134,11 @@ public class DevicesListFragment extends SherlockFragment implements OnHostSearc
 	@Override
 	public void onSearchComplete() 
 	{
-		/*ProgressBar pb = (ProgressBar) findViewById(R.id.network_scan_activity_progress_bar);
-		TextView pbText = (TextView) findViewById(R.id.network_scan_activity_progress_bar_text);
-		pbText.setText("Network Scan complete");
-		pb.setVisibility(View.GONE);*/
+		/*for(Device d : _adapter.GetItems())
+		{
+			database.	
+		}*/
+		
 	}
 	
 	
