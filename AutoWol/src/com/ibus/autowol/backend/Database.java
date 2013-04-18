@@ -255,7 +255,7 @@ public class Database {
 	  {
 		  ContentValues contentValues = new ContentValues();
 		  
-		  contentValues.put(COLUMN_ROUTER_SSID, router.getName());
+		  contentValues.put(COLUMN_ROUTER_SSID, router.getSsid());
 		  contentValues.put(COLUMN_ROUTER_IP, router.getIpAddress());
 		  contentValues.put(COLUMN_ROUTER_MAC, router.getMacAddress());
 		  contentValues.put(COLUMN_ROUTER_BSSID, router.getBssid());
@@ -291,7 +291,7 @@ public class Database {
 	  {
 		  	Router h = new Router();
 			h.setPrimaryKey(cursor.getInt(ORDINAL_ROUTER_ID));
-			h.setName(cursor.getString(ORDINAL_ROUTER_SSID));
+			h.setSsid(cursor.getString(ORDINAL_ROUTER_SSID));
 			h.setIpAddress(cursor.getString(ORDINAL_ROUTER_IP));
 			h.setMacAddress(cursor.getString(ORDINAL_ROUTER_MAC));
 			h.setBssid(cursor.getString(ORDINAL_ROUTER_BSSID));
