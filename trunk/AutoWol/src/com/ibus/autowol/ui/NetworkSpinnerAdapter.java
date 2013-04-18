@@ -10,14 +10,15 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import com.ibus.autowol.R;
+import com.ibus.autowol.backend.Router;
 
 
 public class NetworkSpinnerAdapter extends BaseAdapter implements SpinnerAdapter
 {
-	private List<NetworkListItem> _items;
+	private List<Router> _items;
 	private LayoutInflater _inflater;
 	
-	public NetworkSpinnerAdapter(List<NetworkListItem> items, LayoutInflater inflater)
+	public NetworkSpinnerAdapter(List<Router> items, LayoutInflater inflater)
 	{
 		_items = items;
 		_inflater = inflater;
@@ -57,7 +58,7 @@ public class NetworkSpinnerAdapter extends BaseAdapter implements SpinnerAdapter
         }
         
         TextView n=(TextView)view.findViewById(R.id.network_list_item_name);
-        n.setText(_items.get(position).getNetworkName());
+        n.setText(_items.get(position).getSsid());
  
         return view; 
     }

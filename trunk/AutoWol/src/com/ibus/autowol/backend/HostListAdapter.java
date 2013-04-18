@@ -52,5 +52,19 @@ public class HostListAdapter extends ArrayAdapter<Device>
 	{
 		return _objects;
 	}
+	
+	public int GetPositionForMac(String deviceMac)
+	{
+		for(Device d : _objects)
+		{
+			if(d.getMacAddress().equals(deviceMac))
+				return getPosition(d);
+		}
+		
+		return -1;
+	}
 
 }
+
+
+

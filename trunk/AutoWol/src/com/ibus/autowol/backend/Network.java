@@ -34,9 +34,12 @@ public abstract class Network
     private static Cidr _cidr;    
     private static String _carrier = null;
     private static WifiInfo wifiInfo;
-
+    private static Router router;
     
-    public static String getNetmaskIp() {
+    public static Router getRouter() {
+		return router;
+	}
+	public static String getNetmaskIp() {
 		return _netmaskIp;
 	}
 	public static String getGatewayIp() {
@@ -48,9 +51,7 @@ public abstract class Network
 	public static String getNetworkStartIp() {
 		return _networkStartIp;
 	}
-	public static String getNetworkName() {
-		return wifiInfo.getSSID();
-	}
+	
 	
 	public static void refresh(final Context ctxt)
     {
@@ -96,7 +97,14 @@ public abstract class Network
         {
         	_gatewayIp = IpAddress.getStringFromIntSigned(wifiManager.getDhcpInfo().gateway);
         	_netmaskIp = IpAddress.getStringFromIntSigned(wifiManager.getDhcpInfo().netmask);
+        	
         	wifiInfo = wifiManager.getConnectionInfo();
+        	router = new Router();
+        	router.setBssid(wifiInfo.getBSSID());
+        	router.setIpAddress(IpAddress.getStringFromIntSigned(wifiInfo.getIpAddress()));
+        	router.setMacAddress(wifiInfo.getMacAddress());
+        	router.setSsid(wifiInfo.getSSID());
+        	
         	
             return true;
         }

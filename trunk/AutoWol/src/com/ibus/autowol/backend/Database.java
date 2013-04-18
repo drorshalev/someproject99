@@ -17,8 +17,8 @@ public class Database {
 	  private final Context context;
 	  private myDbHelper dbHelper;
 	  
-	  private static final int DATABASE_VERSION = 4;
-	  private static final String DATABASE_NAME = "AutoWol.db";
+	  private static final int DATABASE_VERSION = 8;
+	  private static final String DATABASE_NAME = "AutoWol2.db";
 	  	
 	  //
 	  // DEVICE TABLE
