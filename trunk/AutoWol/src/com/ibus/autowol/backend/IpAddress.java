@@ -1,6 +1,5 @@
 package com.ibus.autowol.backend;
 
-import java.io.Serializable;
 
 public abstract class IpAddress  
 {
