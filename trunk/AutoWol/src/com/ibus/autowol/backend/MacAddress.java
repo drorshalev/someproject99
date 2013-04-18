@@ -1,13 +1,5 @@
 package com.ibus.autowol.backend;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import android.util.Log;
 
 public abstract class MacAddress 
 {

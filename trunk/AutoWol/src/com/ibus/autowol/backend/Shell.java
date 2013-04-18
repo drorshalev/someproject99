@@ -1,6 +1,7 @@
 package com.ibus.autowol.backend;
 
 import java.io.IOException;
+
 import android.util.Log;
 
 public abstract class Shell 

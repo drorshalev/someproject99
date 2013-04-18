@@ -2,9 +2,8 @@ package com.ibus.autowol.backend;
 
 import java.net.UnknownHostException;
 
-import android.util.Log;
-
 import jcifs.netbios.NbtAddress;
+import android.util.Log;
 
 public abstract class Jcifs 
 {

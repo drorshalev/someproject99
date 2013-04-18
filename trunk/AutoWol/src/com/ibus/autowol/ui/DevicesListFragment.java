@@ -1,20 +1,14 @@
 package com.ibus.autowol.ui;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -23,7 +17,6 @@ import com.ibus.autowol.backend.Device;
 import com.ibus.autowol.backend.HostEnumerator;
 import com.ibus.autowol.backend.HostListAdapter;
 import com.ibus.autowol.backend.Network;
-import com.ibus.autowol.backend.Serialiser;
 
 public class DevicesListFragment extends SherlockFragment implements OnHostSearchProgressListener, OnHostSearchCompleteListener
 {
