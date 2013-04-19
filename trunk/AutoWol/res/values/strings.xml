@@ -8,6 +8,7 @@
     <string name="title_activity_display_message">My Message</string>
 
     <string name="wake_host_button_title">Wake Host</string>
+    <string name="scan_network_button_title">Scan Network</string>
     <string name="delete_host_button_title">Delete Host</string>
     <string name="add_host_button_title">Add Host</string>
     <string name="prompt_network_scan_dialog_fragment_message">Youre devices list is empty. Would you like scan your network for devices now?</string>

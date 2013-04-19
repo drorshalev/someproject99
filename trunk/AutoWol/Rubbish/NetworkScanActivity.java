@@ -18,7 +18,7 @@ import com.ibus.autowol.backend.HostEnumerator;
 import com.ibus.autowol.backend.IpAddress;
 import com.ibus.autowol.backend.Network;
 
-public class NetworkScanActivity extends SherlockFragmentActivity implements OnHostSearchCompleteListener, OnHostSearchProgressListener
+public class NetworkScanActivity extends SherlockFragmentActivity implements OnScanCompleteListener, OnScanProgressListener
 {
 	NetworkScanFragment _fragment;
 	
@@ -77,7 +77,7 @@ public class NetworkScanActivity extends SherlockFragmentActivity implements OnH
     }
 	
 	@Override
-	public void onHostSearchProgress(Device host) 
+	public void onScanProgress(Device host) 
 	{
 		ProgressBar pb = (ProgressBar) findViewById(R.id.network_scan_activity_progress_bar);
 		pb.incrementProgressBy(1);
@@ -85,7 +85,7 @@ public class NetworkScanActivity extends SherlockFragmentActivity implements OnH
 	}
 	
 	@Override
-	public void onSearchComplete() 
+	public void onScanComplete() 
 	{
 		ProgressBar pb = (ProgressBar) findViewById(R.id.network_scan_activity_progress_bar);
 		TextView pbText = (TextView) findViewById(R.id.network_scan_activity_progress_bar_text);

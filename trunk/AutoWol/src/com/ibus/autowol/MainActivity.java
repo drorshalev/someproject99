@@ -5,51 +5,36 @@ import java.util.List;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.ibus.autowol.backend.Network;
-import com.ibus.autowol.ui.ActionBarNavigationListener;
 import com.ibus.autowol.ui.ActivityListItem;
+import com.ibus.autowol.ui.DevicesListFragment;
 import com.ibus.autowol.ui.NavigationSpinnerAdapter;
-import com.ibus.autowol.ui.NetworkScanActivity;
-
-
+import com.ibus.autowol.ui.OnScanStartListener;
 
 public class MainActivity extends SherlockFragmentActivity 
 {	
 	private static final String TAG = "MainActivity";
 	private ActionBarNavigationListener _actionBarNavigationListener;
-	//protected NetInfo net = null;
+	List<OnScanStartListener> _scanStartListeners; 
 	
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) 
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         Network.refresh(this);
         InitialiseActionBar();
+        _scanStartListeners = new ArrayList<OnScanStartListener>();
     }
-    
-    
-    private void InitialiseActionBar()
-    {
-    	List<ActivityListItem> ar = new ArrayList<ActivityListItem>();
-        ar.add(new ActivityListItem("Devices", "Devices"));
-        ar.add(new ActivityListItem("Rules", "Rules"));
-        ar.add(new ActivityListItem("Settings", "Settings"));
-    	
-        _actionBarNavigationListener = new ActionBarNavigationListener(this);
-        
-    	ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        actionBar.setListNavigationCallbacks(new NavigationSpinnerAdapter(ar, this), _actionBarNavigationListener);
-    }
-    
    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) 
@@ -64,21 +49,22 @@ public class MainActivity extends SherlockFragmentActivity
     {
         switch (item.getItemId()) 
         {
-            case R.id.add_host:
-            	GoToNetworkScanActivity();    	
+            /*case R.id.add_host:
+            	GoToNetworkScanActivity(); */ 
+            case R.id.activity_main_scan:
+            	startScan();   	
         }
         
         return true;
-    }
-    
-    public void GoToNetworkScanActivity()
+    }    
+   
+    private void startScan()
     {
-    	Intent intent = new Intent(this, NetworkScanActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+    	for (OnScanStartListener listener : _scanStartListeners) 
+		{
+			listener.onScanStart();
+        }
     }
-    
-    
     
     @Override
     protected void onPause() {
@@ -95,16 +81,109 @@ public class MainActivity extends SherlockFragmentActivity
         super.onDestroy();
         // The activity is about to be destroyed.
     }
-    
 
 	@Override
 	protected void onNewIntent(Intent intent) 
 	{
 	    super.onNewIntent(intent);
 	    intent.getStringExtra("DATA");
-	} 
+	}
+	
+	
+	
+	public void addScanStartListener(OnScanStartListener listener) {
+    	_scanStartListeners.add(listener);
+    }
     
-    /*@Override
+    private void InitialiseActionBar()
+    {
+    	List<ActivityListItem> ar = new ArrayList<ActivityListItem>();
+        ar.add(new ActivityListItem("Devices", "Devices"));
+        ar.add(new ActivityListItem("Rules", "Rules"));
+        ar.add(new ActivityListItem("Settings", "Settings"));
+    	
+        _actionBarNavigationListener = new ActionBarNavigationListener();
+        
+    	ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        actionBar.setListNavigationCallbacks(new NavigationSpinnerAdapter(ar, this), _actionBarNavigationListener);
+    }
+    
+   /* public void GoToNetworkScanActivity()
+    {
+    	Intent intent = new Intent(this, NetworkScanActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }*/
+    
+    
+	
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Navigation listener //////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	public class ActionBarNavigationListener implements ActionBar.OnNavigationListener
+	{
+		DevicesListFragment _devicesListFragment;
+
+		public ActionBarNavigationListener()
+		{
+		}
+		
+		@Override
+		public boolean onNavigationItemSelected(int position, long itemId) 
+		{
+			return DisplayDevicesFragment();
+		}
+		
+		
+		private boolean DisplayDevicesFragment()
+		{
+			DevicesListFragment devicesListFragment = getDevicesListFragment();
+			
+			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+			ft.replace(android.R.id.content, devicesListFragment);
+			ft.commit();
+			
+			return true;  
+		}
+
+		public DevicesListFragment getDevicesListFragment()
+		{
+			if(_devicesListFragment == null)
+			{
+				_devicesListFragment = (DevicesListFragment)SherlockFragment.instantiate(MainActivity.this, DevicesListFragment.class.getName()); 
+				addScanStartListener(_devicesListFragment);
+			}
+			return _devicesListFragment;
+		}
+			    
+	}
+	
+	
+}
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*@Override
     public boolean onOptionsItemSelected(MenuItem item) 
     {
         return false;
@@ -268,7 +347,7 @@ public class MainActivity extends SherlockFragmentActivity
     //net = new NetInfo(getApplicationContext());
     //net.getIp();
    
-}
+
     
    
 

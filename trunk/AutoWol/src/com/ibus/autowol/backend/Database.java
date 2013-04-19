@@ -1,6 +1,7 @@
 package com.ibus.autowol.backend;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -333,6 +334,25 @@ public class Database {
 			  return cursorRowToRouter(cursor);
 		  
 		  return null;
+	  }
+	  
+	  public int deleteDevicesForRoputer(int routerId) 
+	  {
+		  String[] params = {((Integer)routerId).toString()};
+		  
+		  //delete operation useses cascade delete triggers so we don't have 
+		  //to do anything other than delete the location. this will also delete 
+		  //any attached actions and plugins
+		  return db.delete(TABLE_DEVICE, COLUMN_DEVICE_ROUTER_ID + "=?" , params);
+	  }
+
+	  
+	  public void saveDevicesForRoputer(List<Device> devices, int routerId) 
+	  {
+		  for(Device d : devices)
+		  {
+			  saveDevice(d, routerId);
+		  }
 	  }
 	  
 	  

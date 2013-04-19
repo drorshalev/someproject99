@@ -100,7 +100,7 @@ public abstract class ListClickListener implements AdapterView.OnItemClickListen
 	
 	
 	@SuppressWarnings("unchecked")
-	public <T> List<T> GetItems() 
+	public <T> List<T> getSelectedItems() 
 	{
 		List<View> vl = new ArrayList<View>(_selectedItems);
 		List<T> ol = new ArrayList<T>();

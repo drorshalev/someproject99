@@ -63,6 +63,16 @@ public class NetworkSpinnerAdapter extends BaseAdapter implements SpinnerAdapter
         return view; 
     }
 	
+	public int GetPositionForMac(String deviceMac)
+	{
+		for(Router d : _items)
+		{
+			if(d.getMacAddress().equals(deviceMac))
+				return _items.indexOf(d);
+		}
+		
+		return -1;
+	}
 	
 	
 }
