@@ -14,7 +14,7 @@ import com.ibus.autowol.R;
 import com.ibus.autowol.backend.Device;
 import com.ibus.autowol.backend.HostListAdapter;
 
-public class NetworkScanFragment extends SherlockFragment implements OnHostSearchProgressListener
+public class NetworkScanFragment extends SherlockFragment implements OnScanProgressListener
 {
 	HostListAdapter _adapter;
 	private ListClickListener listClickListener;
@@ -48,7 +48,7 @@ public class NetworkScanFragment extends SherlockFragment implements OnHostSearc
 	
 
 	@Override
-	public void onHostSearchProgress(Device host) 
+	public void onScanProgress(Device host) 
 	{
 		if(host != null)
 		{

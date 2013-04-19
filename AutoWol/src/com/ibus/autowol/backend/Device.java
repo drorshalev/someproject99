@@ -66,6 +66,15 @@ public class Device implements Serializable
 	}
 
 	
+	public void copyFromScannedDevice(Device device)
+	{
+		//does not overwrite display name or primary key 
+		name = device.getName();
+		ipAddress = device.getIpAddress();
+		macAddress = device.getMacAddress();
+		nicVendor = device.getNicVendor();
+	}
+	
 	
 }
 
