@@ -1,5 +1,6 @@
 package com.ibus.autowol.test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ibus.autowol.backend.Database;
@@ -105,7 +106,49 @@ public class DatabaseTests extends AndroidTestCase {
 	}
 	
 	
+	public void testDeleteDevicesForRoputer()
+	{
+		Router r = GetRandomRouter();
+		Device d1 = GetRandomDevice();
+		Device d2 = GetRandomDevice();
+		
+		int rpk = db.saveRouter(r);
+		int d1pk = db.saveDevice(d1, rpk);
+		int d2pk = db.saveDevice(d2, rpk);
+		
+		Router r2 = db.getRouter(rpk);
+		Device d3 = db.getDevice(d1pk);
+		Device d4 = db.getDevice(d2pk);
+		
+		assertTrue(r2 != null);
+		assertTrue(d3 != null);
+		assertTrue(d4 != null);
+		
+		db.deleteDevicesForRoputer(rpk);
+		
+		Device d5 = db.getDevice(d1pk);
+		Device d6 = db.getDevice(d2pk);
+		
+		assertTrue(d5 == null);
+		assertTrue(d6 == null);
 	
+	}
+	
+	public void testSaveDevicesForRoputer()
+	{
+		List<Device> devl= new ArrayList<Device>();
+		
+		Router r = GetRandomRouter();
+		devl.add(GetRandomDevice());
+		devl.add(GetRandomDevice());
+		
+		int rpk = db.saveRouter(r);
+		db.saveDevicesForRoputer(devl, rpk);
+		
+		List<Device> devl2 = db.getDevicesForRouter(rpk);
+		
+		assertTrue(devl2.size() == 2);
+	}
 	
 	
 	private Router GetRandomRouter()
