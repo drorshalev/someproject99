@@ -14,7 +14,11 @@ public class HostEnumerator extends AsyncTask<Void, Device, Boolean>
 	private final String TAG = "HostEnumerator";
 	List<OnScanProgressListener> _scanProgressListeners;
 	List<OnScanCompleteListener> _scanCompleteListeners; 
-	
+	private Network _network;
+
+	public void setNetwork(Network network) {
+		_network = network;
+	}
 	
 	public HostEnumerator()
 	{
@@ -25,8 +29,8 @@ public class HostEnumerator extends AsyncTask<Void, Device, Boolean>
 	@Override
 	protected Boolean doInBackground(Void... params) 
 	{
-		Long start = IpAddress.getUnsignedLongFromString(Network.getNetworkStartIp());
-		Long end = IpAddress.getUnsignedLongFromString(Network.getNetworkEndIp());
+		Long start = IpAddress.getUnsignedLongFromString(_network.getNetworkStartIp());
+		Long end = IpAddress.getUnsignedLongFromString(_network.getNetworkEndIp());
 		List<Device> hosts = null;
 		try 
 		{

@@ -20,42 +20,42 @@ import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-public abstract class Network 
+public class Network 
 {
     //private SharedPreferences prefs;
-	private static Context _ctxt;
-    private static final String TAG = "Network";
+	private Context _ctxt;
+    private final String TAG = "Network";
     
-    private static String _networkStartIp;
-    private static String _networkEndIp;
-    private static String _gatewayIp;
-    private static String _netmaskIp;
-    private static Device _device;
-    private static Cidr _cidr;    
-    private static String _carrier = null;
-    private static WifiInfo wifiInfo;
-    private static Router router;
+    private String _networkStartIp;
+    private String _networkEndIp;
+    private String _gatewayIp;
+    private String _netmaskIp;
+    private Device _device;
+    private Cidr _cidr;    
+    private String _carrier = null;
+    private WifiInfo wifiInfo;
+    private Router router;
     
-    public static Router getRouter() {
+    public Router getRouter() {
 		return router;
 	}
-	public static String getNetmaskIp() {
+	public String getNetmaskIp() {
 		return _netmaskIp;
 	}
-	public static String getGatewayIp() {
+	public String getGatewayIp() {
 		return _gatewayIp;
 	}
-	public static String getNetworkEndIp() {
+	public String getNetworkEndIp() {
 		return _networkEndIp;
 	}
-	public static String getNetworkStartIp() {
+	public String getNetworkStartIp() {
 		return _networkStartIp;
 	}
 	
 	
-	public static void refresh(final Context ctxt)
+	public void refresh(final Context ctxt)
     {
-    	Network._ctxt = ctxt;
+    	_ctxt = ctxt;
     	setDevice();
     	setWifiInfo();
     	
@@ -64,7 +64,7 @@ public abstract class Network
     
 	
     //set ip of the device to the first valid ip found a network interface
-    private static void setDevice() 
+    private void setDevice() 
     {
     	_device = new Device();
         try 
@@ -90,7 +90,7 @@ public abstract class Network
     }
     
 
-    private static boolean setWifiInfo() 
+    private boolean setWifiInfo() 
     {
         WifiManager wifiManager = (WifiManager) _ctxt.getSystemService(Context.WIFI_SERVICE);
         if (wifiManager != null) 
@@ -112,7 +112,7 @@ public abstract class Network
     }
     
     
-    private static void setHostBounds()
+    private void setHostBounds()
     {
     	_cidr = new Cidr(_netmaskIp);
     	
@@ -138,7 +138,7 @@ public abstract class Network
 
     
     
-    public static boolean IsGateway(String ipAddress)
+    public boolean IsGateway(String ipAddress)
     {
     	if(ipAddress == null)
     		return false;
@@ -149,7 +149,7 @@ public abstract class Network
     
     
     
-    private static String getInterfaceFirstIp(NetworkInterface ni) 
+    private String getInterfaceFirstIp(NetworkInterface ni) 
     {
         if (ni != null) 
         {
@@ -173,7 +173,7 @@ public abstract class Network
     }
 
     
-    public static boolean isConnectedToNetwork(Context ctxt) 
+    public boolean isConnectedToNetwork(Context ctxt) 
     {
         NetworkInfo nfo = ((ConnectivityManager) ctxt.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
         if (nfo != null) {
@@ -188,7 +188,7 @@ public abstract class Network
     
 
 
-    public static boolean getMobileInfo() {
+    public boolean getMobileInfo() {
         TelephonyManager tm = (TelephonyManager) _ctxt.getSystemService(Context.TELEPHONY_SERVICE);
         if (tm != null) {
             _carrier = tm.getNetworkOperatorName();
@@ -196,7 +196,7 @@ public abstract class Network
         return false;
     }
 
-    public static String getNetIp() 
+    public String getNetIp() 
     {
         int shift = (32 - _cidr.getCidr());
         int start = ((int) IpAddress.getUnsignedLongFromString(_device.getIpAddress()) >> shift << shift);

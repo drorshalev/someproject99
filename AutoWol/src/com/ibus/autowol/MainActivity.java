@@ -31,7 +31,6 @@ public class MainActivity extends SherlockFragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Network.refresh(this);
         InitialiseActionBar();
         _scanStartListeners = new ArrayList<OnScanStartListener>();
     }
@@ -155,6 +154,7 @@ public class MainActivity extends SherlockFragmentActivity
 			if(_devicesListFragment == null)
 			{
 				_devicesListFragment = (DevicesListFragment)SherlockFragment.instantiate(MainActivity.this, DevicesListFragment.class.getName()); 
+				_devicesListFragment.setNetwork(new Network());
 				addScanStartListener(_devicesListFragment);
 			}
 			return _devicesListFragment;

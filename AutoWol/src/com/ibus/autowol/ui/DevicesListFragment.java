@@ -26,12 +26,17 @@ import com.ibus.autowol.backend.WolSender;
 public class DevicesListFragment extends SherlockFragment implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener
 {
 	HostListAdapter _deviceListadapter;
-	private ListClickListener listClickListener;
-	List<Device> previousDeviceList = new ArrayList<Device>();
+	private ListClickListener _listClickListener;
+	private Network _network;
+
+	public void setNetwork(Network network) {
+		_network = network;
+	}
+
+	
 	
 	public DevicesListFragment()
 	{
-		
 	}
 	
 	@Override
@@ -44,7 +49,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
-		listClickListener = new DeviceListClickListener();
+		_listClickListener = new DeviceListClickListener();
         View v = inflater.inflate(R.layout.host_fragment, container, false);
         return v;
     }
@@ -59,9 +64,10 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		 
 		ListView listView = (ListView) getActivity().findViewById(R.id.host_list);
 		listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-		listView.setOnItemClickListener(listClickListener); 
+		listView.setOnItemClickListener(_listClickListener); 
 		listView.setAdapter(_deviceListadapter);
 		
+		_network.refresh(getActivity());
 		initialiseNetworkList();
 	}
 	
@@ -76,6 +82,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 	@Override
 	public void onScanStart() 
 	{
+		_network.refresh(getActivity());
 		startScan();
 	}
 	
@@ -100,7 +107,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		Database database = new Database(getActivity());
 		database.open();
 		
-		Router r = database.getRouterForMac(Network.getRouter().getMacAddress());
+		Router r = database.getRouterForMac(_network.getRouter().getMacAddress());
 		
 		database.deleteDevicesForRoputer(r.getPrimaryKey());
 		database.saveDevicesForRoputer(_deviceListadapter.GetItems(), r.getPrimaryKey());
@@ -115,10 +122,10 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		database.open();
 		
 		//get or create router 
-		Router r = database.getRouterForMac(Network.getRouter().getMacAddress());
+		Router r = database.getRouterForMac(_network.getRouter().getMacAddress());
 		int routerPk;
 		if(r ==null)
-			routerPk = database.saveRouter(Network.getRouter());
+			routerPk = database.saveRouter(_network.getRouter());
 		else
 			routerPk = r.getPrimaryKey();
 		
@@ -130,7 +137,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		spiner.setAdapter(ntwkAdapter);
 		
 		//select the router of our current network
-		int pos = ntwkAdapter.GetPositionForMac(Network.getRouter().getMacAddress());
+		int pos = ntwkAdapter.GetPositionForMac(_network.getRouter().getMacAddress());
 		if(pos != -1)
 			spiner.setSelection(pos);
 		
@@ -153,6 +160,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 	private void startScan()
 	{
 		HostEnumerator he = new HostEnumerator();
+		he.setNetwork(_network);
 		he.addHostSearchProgressListener(this);
 		he.addHostSearchCompleteListener(this);
 		he.execute();
