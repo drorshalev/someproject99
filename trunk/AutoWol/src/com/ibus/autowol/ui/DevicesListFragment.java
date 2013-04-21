@@ -7,8 +7,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -80,12 +83,15 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 	public void onScanStart() 
 	{
 		_network.refresh(getActivity());
-		_hostEnumerator.scan(_network, this, this);
+		ScanNetwork();
 	}
 	
 	@Override
-	public void onScanProgress(Device host) 
+	public void onScanProgress(Device host, int progress) 
 	{
+		ProgressBar pb = (ProgressBar) getActivity().findViewById(R.id.host_fragment_progress_bar);
+		pb.incrementProgressBy(progress);
+		
 		if(host != null)
 		{
 			Device d = _deviceListadapter.GetDeviceForMac(host.getMacAddress());
@@ -110,6 +116,12 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		database.saveDevicesForRoputer(_deviceListadapter.GetItems(), r.getPrimaryKey());
 		
 		database.close();
+		
+		ProgressBar pb = (ProgressBar) getActivity().findViewById(R.id.host_fragment_progress_bar);
+		pb.setVisibility(View.GONE);
+		
+		LinearLayout pl = (LinearLayout) getActivity().findViewById(R.id.host_fragment_progress_bar_placeholder);
+	    pl.setVisibility(View.VISIBLE);
 	}
 
 	@Override
@@ -155,13 +167,24 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		}
 		else
 		{
-			_hostEnumerator.scan(_network, this, this);
+			ScanNetwork();
 		}
 		database.close();
 	}
 	
 	
-	
+	private void ScanNetwork()
+	{
+		ProgressBar pb = (ProgressBar) getActivity().findViewById(R.id.host_fragment_progress_bar);
+		pb.setMax(255);
+		pb.setProgress(0);
+	    pb.setVisibility(View.VISIBLE);
+		
+	    LinearLayout pl = (LinearLayout) getActivity().findViewById(R.id.host_fragment_progress_bar_placeholder);
+	    pl.setVisibility(View.GONE);
+	    
+		_hostEnumerator.scan(_network, this, this);
+	}
 	
 	
 

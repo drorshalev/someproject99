@@ -4,5 +4,5 @@ import com.ibus.autowol.backend.Device;
 
 public interface OnScanProgressListener 
 {
-	public void onScanProgress (Device host);
+	public void onScanProgress (Device host, int progress);
 }
