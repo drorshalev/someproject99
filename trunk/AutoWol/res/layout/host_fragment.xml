@@ -13,6 +13,24 @@
          android:layout_marginRight="5dp"
          android:layout_marginTop="5dp"
          />
+
+    <LinearLayout 
+	android:id="@+id/host_fragment_progress_bar_placeholder"
+    android:layout_width="match_parent"
+    android:layout_height="5dp"
+    android:orientation="vertical" ></LinearLayout>
+    
+    
+    <ProgressBar style="@android:style/Widget.ProgressBar.Horizontal"
+        android:max="255"
+        android:progress="0"
+        android:id="@+id/host_fragment_progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_marginLeft="5dp"
+         android:layout_marginRight="5dp"
+        android:visibility="gone"/>
+    
     
      <ListView
         android:id="@+id/host_list"
