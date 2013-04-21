@@ -11,8 +11,18 @@ import com.ibus.autowol.ui.OnScanProgressListener;
 
 public class NetworkScanner implements IHostEnumerator
 {
+	public class Result
+	{
+		public Result(Device device, int progress)
+		{
+			this.device = device;
+			this.progress = progress;
+		}
+		public Device device;
+		public int progress;
+	}
 
-	public class Scan extends AsyncTask<Void, Device, Boolean>
+	public class Scan extends AsyncTask<Void, Result, Boolean>
 	{
 		private final String TAG = "HostEnumerator";
 		List<OnScanProgressListener> _scanProgressListeners;
@@ -37,21 +47,25 @@ public class NetworkScanner implements IHostEnumerator
 			List<Device> hosts = null;
 			try 
 			{
+				int ii = 0;
 				for (long i = start; i <= end; i++) 
 				{
 			      Udp.probe(IpAddress.getStringFromLongUnsigned(i));
+			      
+			      publishProgress(new Result(null, ii++));
+			      Thread.sleep(10);
 			    }
-				Thread.sleep(1000);
+				
 				
 				hosts = Arp.EnumerateHosts();
 				for(Device h : hosts)
 				{
 					String n = InetAddressManager.GetHostName(h.getIpAddress());
-					if(n == null)
+					if(n == null || n == h.getIpAddress())
 						n = Jcifs.getHostName(h.getIpAddress());
 					h.setName(n);
 					
-					publishProgress(h);
+					publishProgress(new Result(h, 254));
 				}
 			
 			} catch (InterruptedException e) 
@@ -64,13 +78,14 @@ public class NetworkScanner implements IHostEnumerator
 		}	
 		
 		@Override
-		public void onProgressUpdate (Device... host)
+		public void onProgressUpdate (Result... result)
 		{
-			Log.i(TAG, "updating list item for: " + host[0].getIpAddress());
+			if(result[0].device != null)
+				Log.i(TAG, "updating list item for: " + result[0].device.getIpAddress());
 			
 			for (OnScanProgressListener listener : _scanProgressListeners) 
 			{
-				listener.onScanProgress(host[0]);
+				listener.onScanProgress(result[0].device, result[0].progress );
 	        }
 		}
 		
