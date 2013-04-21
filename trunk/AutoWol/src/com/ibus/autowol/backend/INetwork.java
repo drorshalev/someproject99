@@ -12,7 +12,6 @@ public interface INetwork
 {
     public Router getRouter();
 	public String getNetmaskIp(); 
-	public String getGatewayIp();
 	public String getNetworkEndIp();
 	public String getNetworkStartIp();
 	

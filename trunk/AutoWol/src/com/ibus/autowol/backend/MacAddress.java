@@ -5,7 +5,13 @@ public abstract class MacAddress
 {
 	private final static String TAG = "MacAddress";
 	private static final String NOMAC = "00:00:00:00:00:00";
-										 
+								
+	public static String getEmptyMac()
+	{
+		return NOMAC;
+	}
+	
+	
 	public static boolean isValidMac(String macString)
 	{
 		if(macString == null)

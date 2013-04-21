@@ -17,8 +17,11 @@ import com.actionbarsherlock.view.MenuItem;
 import com.ibus.autowol.R;
 import com.ibus.autowol.backend.Database;
 import com.ibus.autowol.backend.Device;
-import com.ibus.autowol.backend.HostEnumerator;
+import com.ibus.autowol.backend.Factory;
+import com.ibus.autowol.backend.NetworkScanner;
 import com.ibus.autowol.backend.HostListAdapter;
+import com.ibus.autowol.backend.IHostEnumerator;
+import com.ibus.autowol.backend.INetwork;
 import com.ibus.autowol.backend.Network;
 import com.ibus.autowol.backend.Router;
 import com.ibus.autowol.backend.WolSender;
@@ -26,17 +29,13 @@ import com.ibus.autowol.backend.WolSender;
 public class DevicesListFragment extends SherlockFragment implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener
 {
 	HostListAdapter _deviceListadapter;
-	private ListClickListener _listClickListener;
-	private Network _network;
-
-	public void setNetwork(Network network) {
-		_network = network;
-	}
-
-	
+	INetwork _network;
+	IHostEnumerator _hostEnumerator;
 	
 	public DevicesListFragment()
 	{
+		_network = Factory.getNetwork();
+		_hostEnumerator = Factory.getHostEnumerator();
 	}
 	
 	@Override
@@ -49,7 +48,6 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
-		_listClickListener = new DeviceListClickListener();
         View v = inflater.inflate(R.layout.host_fragment, container, false);
         return v;
     }
@@ -64,7 +62,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		 
 		ListView listView = (ListView) getActivity().findViewById(R.id.host_list);
 		listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-		listView.setOnItemClickListener(_listClickListener); 
+		listView.setOnItemClickListener(new DeviceListClickListener()); 
 		listView.setAdapter(_deviceListadapter);
 		
 		_network.refresh(getActivity());
@@ -76,14 +74,13 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 	public void onResume() 
 	{
 		super.onResume();
-		
 	} 
 	
 	@Override
 	public void onScanStart() 
 	{
 		_network.refresh(getActivity());
-		startScan();
+		_hostEnumerator.scan(_network, this, this);
 	}
 	
 	@Override
@@ -107,7 +104,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		Database database = new Database(getActivity());
 		database.open();
 		
-		Router r = database.getRouterForMac(_network.getRouter().getMacAddress());
+		Router r = database.getRouterForBssid(_network.getRouter().getBssid());
 		
 		database.deleteDevicesForRoputer(r.getPrimaryKey());
 		database.saveDevicesForRoputer(_deviceListadapter.GetItems(), r.getPrimaryKey());
@@ -115,6 +112,14 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		database.close();
 	}
 
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+		_hostEnumerator.cancel();
+	}
+	
+	
 	
 	public void initialiseNetworkList()
 	{
@@ -122,7 +127,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		database.open();
 		
 		//get or create router 
-		Router r = database.getRouterForMac(_network.getRouter().getMacAddress());
+		Router r = database.getRouterForBssid(_network.getRouter().getBssid());
 		int routerPk;
 		if(r ==null)
 			routerPk = database.saveRouter(_network.getRouter());
@@ -150,21 +155,13 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		}
 		else
 		{
-			startScan();
+			_hostEnumerator.scan(_network, this, this);
 		}
 		database.close();
 	}
 	
 	
 	
-	private void startScan()
-	{
-		HostEnumerator he = new HostEnumerator();
-		he.setNetwork(_network);
-		he.addHostSearchProgressListener(this);
-		he.addHostSearchCompleteListener(this);
-		he.execute();
-	}
 	
 	
 
