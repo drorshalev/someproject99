@@ -97,10 +97,10 @@ public class DatabaseTests extends AndroidTestCase {
 		
 		db.saveRouter(r1);
 		
-		Router r2 = db.getRouterForMac("1 1");
+		Router r2 = db.getRouterForBssid("1 1");
 		assertTrue(r2 != null);
 		
-		Router r3 = db.getRouterForMac("0");
+		Router r3 = db.getRouterForBssid("0");
 		assertTrue(r3 == null);
 		
 	}
