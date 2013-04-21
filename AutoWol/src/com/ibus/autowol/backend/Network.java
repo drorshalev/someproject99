@@ -20,7 +20,7 @@ import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-public class Network 
+public class Network implements INetwork
 {
     //private SharedPreferences prefs;
 	private Context _ctxt;
@@ -28,7 +28,6 @@ public class Network
     
     private String _networkStartIp;
     private String _networkEndIp;
-    private String _gatewayIp;
     private String _netmaskIp;
     private Device _device;
     private Cidr _cidr;    
@@ -41,9 +40,6 @@ public class Network
 	}
 	public String getNetmaskIp() {
 		return _netmaskIp;
-	}
-	public String getGatewayIp() {
-		return _gatewayIp;
 	}
 	public String getNetworkEndIp() {
 		return _networkEndIp;
@@ -58,7 +54,6 @@ public class Network
     	_ctxt = ctxt;
     	setDevice();
     	setWifiInfo();
-    	
     	setHostBounds();
     }
     
@@ -95,16 +90,25 @@ public class Network
         WifiManager wifiManager = (WifiManager) _ctxt.getSystemService(Context.WIFI_SERVICE);
         if (wifiManager != null) 
         {
-        	_gatewayIp = IpAddress.getStringFromIntSigned(wifiManager.getDhcpInfo().gateway);
         	_netmaskIp = IpAddress.getStringFromIntSigned(wifiManager.getDhcpInfo().netmask);
         	
         	wifiInfo = wifiManager.getConnectionInfo();
+        	String gatewayIp = IpAddress.getStringFromIntSigned(wifiManager.getDhcpInfo().gateway);
         	router = new Router();
         	router.setBssid(wifiInfo.getBSSID());
-        	router.setIpAddress(IpAddress.getStringFromIntSigned(wifiInfo.getIpAddress()));
-        	router.setMacAddress(wifiInfo.getMacAddress());
         	router.setSsid(wifiInfo.getSSID());
+        	router.setIpAddress(gatewayIp);
         	
+        	/*
+        	 * Note: 
+        	 * 
+        	 * router.setIpAddress(IpAddress.getStringFromIntSigned(wifiInfo.getIpAddress()));
+        	 * and 
+        	 * router.setMacAddress(wifiInfo.getMacAddress());
+        	 * 
+        	 * are the ip and mac of the local devices wireless adapter (i.e the phone)
+        	 *  
+        	*/
         	
             return true;
         }
@@ -136,19 +140,6 @@ public class Network
     	_networkEndIp = IpAddress.getStringFromLongUnsigned(end);
     }
 
-    
-    
-    public boolean IsGateway(String ipAddress)
-    {
-    	if(ipAddress == null)
-    		return false;
-    	
-    	return ipAddress.equals(_gatewayIp);
-    }
-    
-    
-    
-    
     private String getInterfaceFirstIp(NetworkInterface ni) 
     {
         if (ni != null) 
@@ -173,6 +164,16 @@ public class Network
     }
 
     
+
+    
+    public boolean IsGateway(String ipAddress)
+    {
+    	if(ipAddress == null)
+    		return false;
+    	
+    	return ipAddress.equals(router.getIpAddress());
+    }
+    
     public boolean isConnectedToNetwork(Context ctxt) 
     {
         NetworkInfo nfo = ((ConnectivityManager) ctxt.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
@@ -182,6 +183,7 @@ public class Network
         
         return false;
     }
+    
     
     
     //* UNUSED 8888888888888888888888888888888888888888888888888888888888888888888888888888888888888 */

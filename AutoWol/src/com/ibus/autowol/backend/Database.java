@@ -124,8 +124,8 @@ public class Database {
 	  private static final String SQL_GET_ROUTER = 
 			  "select * from " + TABLE_ROUTER + " where " + COLUMN_ROUTER_ID + "=?";
 	  
-	  private static final String SQL_GET_ROUTER_FOR_MAC = 
-			  "select * from " + TABLE_ROUTER + " where " + COLUMN_ROUTER_MAC + "=?";
+	  private static final String SQL_GET_ROUTER_FOR_BSSID = 
+			  "select * from " + TABLE_ROUTER + " where " + COLUMN_ROUTER_BSSID + "=?";
 	  
 	  
 	  private static final String SQL_GET_DEVICE = 
@@ -325,10 +325,10 @@ public class Database {
 		  return null;
 	  }
 	  
-	  public Router getRouterForMac(String mac) 
+	  public Router getRouterForBssid(String bssid) 
 	  {
-		  String[] params = {mac};
-		  Cursor cursor = db.rawQuery(SQL_GET_ROUTER_FOR_MAC, params);
+		  String[] params = {bssid};
+		  Cursor cursor = db.rawQuery(SQL_GET_ROUTER_FOR_BSSID, params);
 		  
 		  if(cursor.moveToFirst())
 			  return cursorRowToRouter(cursor);

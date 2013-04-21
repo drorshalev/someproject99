@@ -39,7 +39,6 @@ public class MainActivity extends SherlockFragmentActivity
     public boolean onCreateOptionsMenu(Menu menu) 
     {
     	getSupportMenuInflater().inflate(R.menu.activity_main, menu);
-        
         return true; 
     }
     
@@ -154,7 +153,6 @@ public class MainActivity extends SherlockFragmentActivity
 			if(_devicesListFragment == null)
 			{
 				_devicesListFragment = (DevicesListFragment)SherlockFragment.instantiate(MainActivity.this, DevicesListFragment.class.getName()); 
-				_devicesListFragment.setNetwork(new Network());
 				addScanStartListener(_devicesListFragment);
 			}
 			return _devicesListFragment;

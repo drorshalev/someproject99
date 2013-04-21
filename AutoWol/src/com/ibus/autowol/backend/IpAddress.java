@@ -6,6 +6,10 @@ public abstract class IpAddress
 	private static final String NOIP = "0.0.0.0";
 	private static final String NOMASK = "255.255.255.255";
 
+	public static String GetEmptyIp()
+	{
+		return NOIP;
+	}
     
     public static boolean isValidIp(String ipAddress)
     {
