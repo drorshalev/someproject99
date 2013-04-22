@@ -74,6 +74,16 @@ public class NetworkSpinnerAdapter extends BaseAdapter implements SpinnerAdapter
 		return -1;
 	}
 	
+	public int GetPositionForBssid(String bssid)
+	{
+		for(Router d : _items)
+		{
+			if(d.getBssid().equals(bssid))
+				return _items.indexOf(d);
+		}
+		
+		return -1;
+	}
 	
 }
 
