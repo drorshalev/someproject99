@@ -18,7 +18,7 @@ public class Database {
 	  private final Context context;
 	  private myDbHelper dbHelper;
 	  
-	  private static final int DATABASE_VERSION = 8;
+	  private static final int DATABASE_VERSION = 9;
 	  private static final String DATABASE_NAME = "AutoWol2.db";
 	  	
 	  //
@@ -78,9 +78,9 @@ public class Database {
 		  + " (" 
 		  + COLUMN_ROUTER_ID + " integer primary key autoincrement, " 
 		  + COLUMN_ROUTER_SSID + " text not null, "
-		  + COLUMN_ROUTER_IP + " text not null, "
-		  + COLUMN_ROUTER_MAC + " text not null, "
-		  + COLUMN_ROUTER_BSSID + " text, "
+		  + COLUMN_ROUTER_IP + " text, "
+		  + COLUMN_ROUTER_MAC + " text, "
+		  + COLUMN_ROUTER_BSSID + " text not null, "
 		  + COLUMN_ROUTER_NIC_VENDOR +  " text"
 		  + ");";
 	  

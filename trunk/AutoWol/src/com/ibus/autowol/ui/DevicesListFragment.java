@@ -154,7 +154,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		spiner.setAdapter(ntwkAdapter);
 		
 		//select the router of our current network
-		int pos = ntwkAdapter.GetPositionForMac(_network.getRouter().getMacAddress());
+		int pos = ntwkAdapter.GetPositionForBssid(_network.getRouter().getBssid());
 		if(pos != -1)
 			spiner.setSelection(pos);
 		
