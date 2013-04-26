@@ -1,6 +1,6 @@
 package com.ibus.autowol.backend;
 
-import com.ibus.autowol.mock.EmulatorNetwork;
+import com.ibus.autowol.mock.MockNetwork;
 
 public class Factory 
 {
@@ -21,7 +21,7 @@ public class Factory
 	public static INetwork getNetwork() 
 	{
 		if(inEmulator)
-			return new EmulatorNetwork(); //if we are in an emulator
+			return new MockNetwork(); //if we are in an emulator
 		
 		if (_network == null) {
 			return (INetwork) new Network();

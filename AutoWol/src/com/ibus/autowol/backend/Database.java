@@ -229,6 +229,7 @@ public class Database {
 	  {
 			Device h = new Device();
 			h.setPrimaryKey(cursor.getInt(ORDINAL_DEVICE_ID));
+			h.setRouterId(cursor.getInt(ORDINAL_DEVICE_ROUTER_ID));
 			h.setName(cursor.getString(ORDINAL_DEVICE_NAME));
 			h.setDisplayName(cursor.getString(ORDINAL_DEVICE_DISPLAY_NAME));
 			h.setIpAddress(cursor.getString(ORDINAL_DEVICE_IP));

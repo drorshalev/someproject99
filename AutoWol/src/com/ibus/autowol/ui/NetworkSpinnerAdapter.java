@@ -59,6 +59,8 @@ public class NetworkSpinnerAdapter extends BaseAdapter implements SpinnerAdapter
         
         TextView n=(TextView)view.findViewById(R.id.network_list_item_name);
         n.setText(_items.get(position).getSsid());
+        
+        view.setTag(_items.get(position).getBssid());
  
         return view; 
     }

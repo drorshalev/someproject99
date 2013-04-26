@@ -11,6 +11,7 @@ import com.ibus.autowol.ui.OnScanProgressListener;
 
 public class NetworkScanner implements IHostEnumerator
 {
+	private final String TAG = "AutoWol-NetworkScanner";
 	public class Result
 	{
 		public Result(Device device, int progress)
@@ -24,7 +25,6 @@ public class NetworkScanner implements IHostEnumerator
 
 	public class Scan extends AsyncTask<Void, Result, Boolean>
 	{
-		private final String TAG = "HostEnumerator";
 		List<OnScanProgressListener> _scanProgressListeners;
 		List<OnScanCompleteListener> _scanCompleteListeners; 
 		private INetwork _network;
@@ -42,6 +42,8 @@ public class NetworkScanner implements IHostEnumerator
 		@Override
 		public Boolean doInBackground(Void... params) 
 		{
+			Log.i(TAG, "starting network scan with ip start: " + _network.getNetworkStartIp() + ". ip end:" + _network.getNetworkEndIp());
+			
 			Long start = IpAddress.getUnsignedLongFromString(_network.getNetworkStartIp());
 			Long end = IpAddress.getUnsignedLongFromString(_network.getNetworkEndIp());
 			List<Device> hosts = null;
@@ -56,6 +58,7 @@ public class NetworkScanner implements IHostEnumerator
 			      Thread.sleep(10);
 			    }
 				
+				Log.i(TAG, "successfully completed probing devices on network");
 				
 				hosts = Arp.EnumerateHosts();
 				for(Device h : hosts)
@@ -64,9 +67,11 @@ public class NetworkScanner implements IHostEnumerator
 					if(n == null || n == h.getIpAddress())
 						n = Jcifs.getHostName(h.getIpAddress());
 					h.setName(n);
-					
+				
 					publishProgress(new Result(h, 254));
 				}
+				
+				Log.i(TAG, "successfully completed search for devices in arp cache");
 			
 			} catch (InterruptedException e) 
 			{
@@ -80,9 +85,6 @@ public class NetworkScanner implements IHostEnumerator
 		@Override
 		public void onProgressUpdate (Result... result)
 		{
-			if(result[0].device != null)
-				Log.i(TAG, "updating list item for: " + result[0].device.getIpAddress());
-			
 			for (OnScanProgressListener listener : _scanProgressListeners) 
 			{
 				listener.onScanProgress(result[0].device, result[0].progress );
@@ -92,7 +94,7 @@ public class NetworkScanner implements IHostEnumerator
 		@Override
 		public void onPostExecute (Boolean result)
 		{
-			Log.i(TAG, "Host enumeration complete");
+			Log.i(TAG, "Network scan complete");
 			
 			for (OnScanCompleteListener listener : _scanCompleteListeners) 
 			{
@@ -114,9 +116,10 @@ public class NetworkScanner implements IHostEnumerator
 	@Override
 	public void scan(INetwork network, OnScanProgressListener progressListener, OnScanCompleteListener completeListener)
 	{
-		if(currentScan.getStatus() == AsyncTask.Status.RUNNING)
+		if(currentScan.getStatus() == AsyncTask.Status.RUNNING){
+			Log.i(TAG, "Network scan failed: scan thread already running");
 			return;
-			
+		}
 		currentScan = new Scan();
 		currentScan.setNetwork(network);
 		currentScan.addHostSearchProgressListener(progressListener);
@@ -129,6 +132,8 @@ public class NetworkScanner implements IHostEnumerator
 	{
 		if(currentScan.getStatus() == AsyncTask.Status.RUNNING)
 			currentScan.cancel(true);
+		
+		Log.i(TAG, "Network scan canceled");
 	}
 
 	
