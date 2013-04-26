@@ -13,10 +13,17 @@ public class Device implements Serializable
 	protected String ipAddress;
 	protected String macAddress;	
 	protected String nicVendor;
+	private int routerId;
 	
 	
 	// Properties //////////////////////////////////////////////////////////
 
+	public int getRouterId() {
+		return routerId;
+	}
+	public void setRouterId(int routerId) {
+		this.routerId = routerId;
+	}
 	public String getDisplayName() {
 		return displayName;
 	}

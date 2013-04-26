@@ -11,7 +11,7 @@ import android.util.Log;
 public abstract class Arp 
 {
 	static String arpFileLocation = "/proc/net/arp";
-	private final static String TAG = "Arp";
+	private final static String TAG = "AutoWol-Arp";
     private final static int BUF = 8 * 1024;
 	
 	
@@ -46,8 +46,13 @@ public abstract class Arp
 	        		h.setMacAddress(parts[3]);
 	        		h.setNicVendor(parts[5]);
 	        		
-	        		if(MacAddress.isValidMac(h.getMacAddress()))
+	        		//will be many devices in arp without a mac. not sure why. but i suspect the router will reply to 
+	        		//arp queries where no other device does? 
+	        		if(MacAddress.isValidMac(h.getMacAddress())) 
+	        		{
 	        			hosts.add(h);
+	        			Log.i(TAG, "Device found in arp cache ip: " + h.getIpAddress() + ". mac:" + h.getMacAddress());
+	        		}
 	        	}
 	        	
 	        	firstLine = false;	        	

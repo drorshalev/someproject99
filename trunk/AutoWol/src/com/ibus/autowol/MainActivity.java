@@ -6,6 +6,7 @@ import java.util.List;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
@@ -116,6 +117,19 @@ public class MainActivity extends SherlockFragmentActivity
     }*/
     
     
+	 @Override        
+	 public void onSaveInstanceState(Bundle SavedInstanceState) {
+		 super.onSaveInstanceState(SavedInstanceState);     
+		 Log.i(TAG, "Saving instance state");
+	 }
+	 
+	 @Override    
+	 public void onRestoreInstanceState(Bundle savedInstanceState) {
+		 super.onRestoreInstanceState(savedInstanceState);
+		 Log.i(TAG, "Restoring instance state");
+	 } 
+	
+    
 	
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,7 +138,7 @@ public class MainActivity extends SherlockFragmentActivity
 	
 	public class ActionBarNavigationListener implements ActionBar.OnNavigationListener
 	{
-		DevicesListFragment _devicesListFragment;
+		//DevicesListFragment _devicesListFragment;
 
 		public ActionBarNavigationListener()
 		{
@@ -150,11 +164,15 @@ public class MainActivity extends SherlockFragmentActivity
 
 		public DevicesListFragment getDevicesListFragment()
 		{
-			if(_devicesListFragment == null)
+			DevicesListFragment _devicesListFragment = (DevicesListFragment)SherlockFragment.instantiate(MainActivity.this, DevicesListFragment.class.getName()); 
+			addScanStartListener(_devicesListFragment);
+			
+			
+			/*if(_devicesListFragment == null)
 			{
 				_devicesListFragment = (DevicesListFragment)SherlockFragment.instantiate(MainActivity.this, DevicesListFragment.class.getName()); 
 				addScanStartListener(_devicesListFragment);
-			}
+			}*/
 			return _devicesListFragment;
 		}
 			    
