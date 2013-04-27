@@ -12,6 +12,7 @@
     <TextView android:id="@+id/network_list_item_name"
 		        android:layout_width="wrap_content"
 		    	android:layout_height="wrap_content"
-		    	android:textSize="24sp" />
+		    	android:textSize="24sp" 
+		    	android:layout_marginLeft="5dp"/>
    
 </LinearLayout>
