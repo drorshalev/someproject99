@@ -44,7 +44,7 @@ public abstract class ListClickListener implements AdapterView.OnItemClickListen
 		}
 		else
 		{
-			view.setBackgroundColor(_activity.getResources().getColor(R.color.awol_blue));
+			view.setBackgroundColor(_activity.getResources().getColor(com.actionbarsherlock.R.color.abs__holo_blue_light));
 			_selectedItems.add(view);
 		}
 		
