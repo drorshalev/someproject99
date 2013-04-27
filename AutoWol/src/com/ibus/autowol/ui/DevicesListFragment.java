@@ -51,7 +51,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
         View v = inflater.inflate(R.layout.host_fragment, container, false);
-        return v;
+        return v; 
     }
 	
 	@Override
