@@ -189,10 +189,30 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 	    LinearLayout pl = (LinearLayout) getActivity().findViewById(R.id.host_fragment_progress_bar_placeholder);
 	    pl.setVisibility(View.GONE);
 	    
-	    //change the network spinner to select the network we are on
-	    Spinner netorkSpinner = (Spinner) getActivity().findViewById(R.id.host_fragment_networks);
-	    NetworkSpinnerAdapter ntwkAdapter = (NetworkSpinnerAdapter)netorkSpinner.getAdapter();
-
+	    //get or create router
+		Database database = new Database(getActivity());
+		database.open();
+		
+		Spinner netorkSpinner = (Spinner) getActivity().findViewById(R.id.host_fragment_networks);
+		NetworkSpinnerAdapter ntwkAdapter = (NetworkSpinnerAdapter)netorkSpinner.getAdapter();
+		
+	    Router router = database.getRouterForBssid(_network.getRouter().getBssid());
+		if(router ==null)
+		{
+			database.saveRouter(_network.getRouter());
+			
+			ntwkAdapter.Add(router);
+			ntwkAdapter.notifyDataSetChanged();
+			
+			Log.i(TAG, "This network is new.  New router saved to db.");
+		}
+		else
+		{
+			Log.i(TAG, "This network is known.  Existing router retrieved from db.");
+		}
+		
+		//Select the router of our current network. Note the NetorkSelectedListener will fire regardless of 
+		//whether we select anything 
 		int pos = ntwkAdapter.GetPositionForBssid(_network.getRouter().getBssid());
 		if(pos != -1)
 		{

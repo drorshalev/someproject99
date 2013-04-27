@@ -17,7 +17,7 @@ public class NetworkSpinnerAdapter extends BaseAdapter implements SpinnerAdapter
 {
 	private List<Router> _items;
 	private LayoutInflater _inflater;
-	
+
 	public NetworkSpinnerAdapter(List<Router> items, LayoutInflater inflater)
 	{
 		_items = items;
@@ -85,6 +85,16 @@ public class NetworkSpinnerAdapter extends BaseAdapter implements SpinnerAdapter
 		}
 		
 		return -1;
+	}
+	
+	public void notifyDataSetChanged()
+	{
+		super.notifyDataSetChanged();
+	}
+	
+	public void Add(Router device)
+	{
+		_items.add(device);
 	}
 	
 }
