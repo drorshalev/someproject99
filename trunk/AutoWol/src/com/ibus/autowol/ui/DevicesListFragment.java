@@ -80,53 +80,57 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		Database database = new Database(getActivity());
 		database.open();
 		
-		Router router = database.getRouterForBssid(_network.getRouter().getBssid());
-		if(router ==null)
-		{
-			database.saveRouter(_network.getRouter());
-			Log.i(TAG, "This network is new.  New router saved to db.");
-		}
-		else
-		{
-			Log.i(TAG, "This network is known.  Existing router retrieved from db.");
-		}
+		saveCurrentRouter(_network.getRouter().getBssid(), database);
 		
-		//get all routers into our spinner
-		List<Router> rl = database.getAllRouters();
-		NetworkSpinnerAdapter ntwkAdapter =new NetworkSpinnerAdapter(rl, getActivity().getLayoutInflater()); 
-		netorkSpinner.setAdapter(ntwkAdapter);
+		populateRouterSpinner(_network.getRouter().getBssid(), database);
 		
 		//Select the router of our current network. Note the NetorkSelectedListener will fire regardless of 
 		//whether we select anything 
-		int pos = ntwkAdapter.GetPositionForBssid(_network.getRouter().getBssid());
-		if(pos != -1)
-		{
-			netorkSpinner.setSelection(pos);
-			Log.i(TAG, "router found in network spinner and selected");
-		}
-		else
-			Log.i(TAG, "router was not found in our netowork spinner. SOMETHING HAS GONE WRONG.");
-		
-		//just check that we are in the apporpriate state
-		if(deviceListadapter.GetItems().size() >0)
-			Log.i(TAG, "adding devices to a non empty device list. SOMETHING HAS GONE WRONG.");
+		selectRouter(_network.getRouter().getBssid());
 		
 		database.close();
 	}
 	
-
+	@Override
+	public void onScanStart() 
+	{
+		 //get or create router
+		Database database = new Database(getActivity());
+		database.open();
+		
+		_network.refresh(getActivity());
+		
+		saveCurrentRouter(_network.getRouter().getBssid(), database);
+		
+		populateRouterSpinner(_network.getRouter().getBssid(), database);
+		
+		//Select the router of our current network. Note the NetorkSelectedListener will fire regardless of 
+		//whether we select anything 
+		selectRouter(_network.getRouter().getBssid());
+		
+		database.close();
+		
+		ScanNetwork();
+	}
+	
+	private void ScanNetwork()
+	{
+		ProgressBar pb = (ProgressBar) getActivity().findViewById(R.id.host_fragment_progress_bar);
+		pb.setMax(255);
+		pb.setProgress(0);
+	    pb.setVisibility(View.VISIBLE);
+		
+	    LinearLayout pl = (LinearLayout) getActivity().findViewById(R.id.host_fragment_progress_bar_placeholder);
+	    pl.setVisibility(View.GONE);
+	   
+		_hostEnumerator.scan(_network, this, this);
+	}
+	
 	@Override
 	public void onResume() 
 	{
 		super.onResume();
 	} 
-	
-	@Override
-	public void onScanStart() 
-	{
-		_network.refresh(getActivity());
-		ScanNetwork();
-	}
 	
 	@Override
 	public void onScanProgress(Device host, int progress) 
@@ -178,62 +182,55 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		super.onDestroy();
 		_hostEnumerator.cancel();
 	}
-	
 
-	private void ScanNetwork()
-	{
-		ProgressBar pb = (ProgressBar) getActivity().findViewById(R.id.host_fragment_progress_bar);
-		pb.setMax(255);
-		pb.setProgress(0);
-	    pb.setVisibility(View.VISIBLE);
-		
-	    LinearLayout pl = (LinearLayout) getActivity().findViewById(R.id.host_fragment_progress_bar_placeholder);
-	    pl.setVisibility(View.GONE);
-	    
-	    //get or create router
-		Database database = new Database(getActivity());
-		database.open();
-		
-		Spinner netorkSpinner = (Spinner) getActivity().findViewById(R.id.host_fragment_networks);
-		NetworkSpinnerAdapter ntwkAdapter = (NetworkSpinnerAdapter)netorkSpinner.getAdapter();
-		
-	    Router router = database.getRouterForBssid(_network.getRouter().getBssid());
-		if(router ==null)
-		{
-			database.saveRouter(_network.getRouter());
-			
-			ntwkAdapter.Add(router);
-			ntwkAdapter.notifyDataSetChanged();
-			
-			Log.i(TAG, "This network is new.  New router saved to db.");
-		}
-		else
-		{
-			Log.i(TAG, "This network is known.  Existing router retrieved from db.");
-		}
-		
-		//Select the router of our current network. Note the NetorkSelectedListener will fire regardless of 
-		//whether we select anything 
-		int pos = ntwkAdapter.GetPositionForBssid(_network.getRouter().getBssid());
-		if(pos != -1)
-		{
-			netorkSpinner.setSelection(pos);
-			Log.i(TAG, "router found in network spinner and selected");
-		}
-		else
-			Log.i(TAG, "router was not found in our netowork spinner. SOMETHING HAS GONE WRONG.");
-	    
-		_hostEnumerator.scan(_network, this, this);
-	}
-	
-	
-	
 	 @Override        
 	 public void onSaveInstanceState(Bundle SavedInstanceState) {
 		 super.onSaveInstanceState(SavedInstanceState);
 		 Log.i(TAG, "Saving instance state");
 	 }
-	  
+	
+	 
+	 private void populateRouterSpinner(String bssid, Database database)
+	 {
+		 Spinner netorkSpinner = (Spinner) getActivity().findViewById(R.id.host_fragment_networks);
+		 
+		 List<Router> rl = database.getAllRouters();
+		 NetworkSpinnerAdapter ntwkAdapter =new NetworkSpinnerAdapter(rl, getActivity().getLayoutInflater()); 
+		 netorkSpinner.setAdapter(ntwkAdapter);
+	 }
+
+
+	 private boolean saveCurrentRouter(String bssid, Database database)
+	 {
+		 Router router = database.getRouterForBssid(bssid);
+		 if(router ==null)
+		 {
+			 database.saveRouter(_network.getRouter());
+			 Log.i(TAG, "This network is new.  New router saved to db.");
+			 return true; //flag router was saved
+		 }
+		 else
+		 {
+			 Log.i(TAG, "This network is known.  Existing router retrieved from db.");
+		 }
+		 
+		 return false; //router was not saved
+	 }
+
+	 private void selectRouter(String bssid)
+	 { 
+		 Spinner netorkSpinner = (Spinner) getActivity().findViewById(R.id.host_fragment_networks);
+		 NetworkSpinnerAdapter ntwkAdapter = (NetworkSpinnerAdapter)netorkSpinner.getAdapter();
+		 
+		 int pos = ntwkAdapter.GetPositionForBssid(bssid);
+		 if(pos != -1)
+		 {
+			 netorkSpinner.setSelection(pos);
+			 Log.i(TAG, "router found in network spinner and selected");
+		 }
+		 else
+			 Log.i(TAG, "router was not found in our netowork spinner. SOMETHING HAS GONE WRONG.");
+	 }
 	
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
