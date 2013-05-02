@@ -179,6 +179,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		_hostEnumerator.cancel();
 	}
 	
+
 	private void ScanNetwork()
 	{
 		ProgressBar pb = (ProgressBar) getActivity().findViewById(R.id.host_fragment_progress_bar);
