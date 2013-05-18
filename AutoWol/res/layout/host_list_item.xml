@@ -10,7 +10,9 @@
     android:background="@color/awol_white"
     >
     
-    <ImageView android:src="@drawable/ic_pc"
+    <ImageView
+        android:id="@+id/host_list_item_device_image" 
+        android:src="@drawable/ic_pc_dissabled"
     android:layout_width="wrap_content"
 	android:layout_height="wrap_content" />
     
@@ -22,11 +24,13 @@
     
     		<TextView android:id="@+id/host_list_item_ip_address"
 		        android:layout_width="wrap_content"
-		    	android:layout_height="wrap_content" />
+		    	android:layout_height="wrap_content"
+		    	android:textColor="@color/dissabled_text" />
     		  
     		  <TextView android:id="@+id/host_list_item_mac_address" 
 		        android:layout_width="wrap_content"
-		    	android:layout_height="wrap_content"/>    
+		    	android:layout_height="wrap_content"
+		    	android:textColor="@color/dissabled_text" />    
     </LinearLayout>
     
     <LinearLayout
@@ -39,6 +43,7 @@
 		    	android:layout_height="wrap_content" 
 		    	android:layout_gravity="right"
 		    	android:textStyle="bold"
+		    	android:textColor="@color/dissabled_text" 
 		    	/>
     </LinearLayout>
     
