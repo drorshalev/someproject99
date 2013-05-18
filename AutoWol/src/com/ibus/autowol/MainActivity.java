@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.widget.ProgressBar;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
@@ -40,6 +41,23 @@ public class MainActivity extends SherlockFragmentActivity
     public boolean onCreateOptionsMenu(Menu menu) 
     {
     	getSupportMenuInflater().inflate(R.menu.activity_main, menu);
+    	
+    	MenuItem scan = (MenuItem)menu.findItem(R.id.activity_main_scan);
+    	
+    	scan.setActionView(R.layout.progress_indicator);
+    	//scan.setActionView(null);
+    	
+    	//scan.collapseActionView();
+    	
+    	//scan.setActionView(null);
+    	
+    	//scan.expandActionView();
+    	
+    	//scan.collapseActionView();
+    	
+
+
+    	
         return true; 
     }
     
@@ -138,7 +156,7 @@ public class MainActivity extends SherlockFragmentActivity
 	
 	public class ActionBarNavigationListener implements ActionBar.OnNavigationListener
 	{
-		//DevicesListFragment _devicesListFragment;
+		DevicesListFragment _devicesListFragment;
 
 		public ActionBarNavigationListener()
 		{
@@ -157,6 +175,7 @@ public class MainActivity extends SherlockFragmentActivity
 			
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.replace(android.R.id.content, devicesListFragment);
+			
 			ft.commit();
 			
 			return true;  
@@ -164,15 +183,12 @@ public class MainActivity extends SherlockFragmentActivity
 
 		public DevicesListFragment getDevicesListFragment()
 		{
-			DevicesListFragment _devicesListFragment = (DevicesListFragment)SherlockFragment.instantiate(MainActivity.this, DevicesListFragment.class.getName()); 
-			addScanStartListener(_devicesListFragment);
-			
-			
-			/*if(_devicesListFragment == null)
+			if(_devicesListFragment == null)
 			{
 				_devicesListFragment = (DevicesListFragment)SherlockFragment.instantiate(MainActivity.this, DevicesListFragment.class.getName()); 
 				addScanStartListener(_devicesListFragment);
-			}*/
+			}
+			
 			return _devicesListFragment;
 		}
 			    

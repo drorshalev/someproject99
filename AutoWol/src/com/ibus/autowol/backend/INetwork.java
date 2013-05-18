@@ -7,6 +7,7 @@
 package com.ibus.autowol.backend;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
 
 public interface INetwork 
 {
@@ -15,9 +16,12 @@ public interface INetwork
 	public String getNetworkEndIp();
 	public String getNetworkStartIp();
 	
-	public void refresh(final Context ctxt);
+	public void refresh(Context ctxt);
     public boolean IsGateway(String ipAddress);
-    public boolean isConnectedToNetwork(Context ctxt);
+    
+    public boolean isMobileNetworkConnected(Context ctxt); 
+    
+    public boolean isWifiNetworkConnected(Context ctxt);
     
     /*public boolean getMobileInfo();
     public String getNetIp();*/

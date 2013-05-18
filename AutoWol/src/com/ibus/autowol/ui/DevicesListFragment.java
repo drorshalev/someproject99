@@ -3,6 +3,7 @@ package com.ibus.autowol.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.Toast;
+
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.ActionMode;
@@ -25,11 +28,13 @@ import com.ibus.autowol.backend.Factory;
 import com.ibus.autowol.backend.HostListAdapter;
 import com.ibus.autowol.backend.IHostEnumerator;
 import com.ibus.autowol.backend.INetwork;
+import com.ibus.autowol.backend.IPinger;
 import com.ibus.autowol.backend.Router;
 import com.ibus.autowol.backend.WolSender;
 
-public class DevicesListFragment extends SherlockFragment implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener
+public class DevicesListFragment extends SherlockFragment implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, OnPingProgressListener, OnPingCompleteListener
 {
+	IPinger _pinger;
 	INetwork _network;
 	IHostEnumerator _hostEnumerator;
 	private final static String TAG = "AutoWol-DevicesListFragment";
@@ -38,6 +43,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 	{
 		_network = Factory.getNetwork();
 		_hostEnumerator = Factory.getHostEnumerator();
+		_pinger = Factory.getPinger();
 	}
 	
 	@Override
@@ -73,44 +79,77 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		Spinner netorkSpinner = (Spinner) getActivity().findViewById(R.id.host_fragment_networks);
 		netorkSpinner.setOnItemSelectedListener(new NetorkSelectedListener());
 		
-		//refresh network info
-		_network.refresh(getActivity());
-		
-		//get or create router
 		Database database = new Database(getActivity());
 		database.open();
 		
-		saveCurrentRouter(_network.getRouter().getBssid(), database);
+		boolean isConnected =_network.isWifiNetworkConnected(getActivity());
+		if(isConnected)
+		{
+			_network.refresh(getActivity());
+			
+			//get or create router
+			saveCurrentRouter(_network.getRouter().getBssid(), database);
 		
-		populateRouterSpinner(_network.getRouter().getBssid(), database);
-		
-		//Select the router of our current network. Note the NetorkSelectedListener will fire regardless of 
-		//whether we select anything 
-		selectRouter(_network.getRouter().getBssid());
+			//populate network spinner with all of our routers
+			populateRouterSpinner(database);
+			
+			//Select the router of our current network. Note the NetorkSelectedListener will fire regardless of 
+			//whether we select anything 
+			selectRouter(_network.getRouter().getBssid());
+		}
+		else
+		{
+			//just populate network spinner with previously discovered routers / networks if we are not on a network
+			populateRouterSpinner(database);
+			Toast.makeText(getActivity(), "Network scan aborted: you are not connected to a network", Toast.LENGTH_LONG).show();
+		}
 		
 		database.close();
 	}
 	
 	@Override
+	public void onAttach (Activity activity)
+	{
+		super.onAttach(activity);
+		Activity ac = activity;
+	}
+	
+	public void onDetach ()
+	{
+		super.onDetach();
+	}
+	
+	
+	@Override
 	public void onScanStart() 
 	{
-		 //get or create router
-		Database database = new Database(getActivity());
-		database.open();
+		//only scan and refresh view if we are on a network
+		boolean isConnected =_network.isWifiNetworkConnected(getActivity());
+		if(isConnected)
+		{
+			Database database = new Database(getActivity());
+			database.open();
+			
+			_network.refresh(getActivity());
+
+			//get or create router
+			saveCurrentRouter(_network.getRouter().getBssid(), database);
+
+			//populate network spinner with all of our routers again since the list might have changed
+			populateRouterSpinner(database);
+			
+			//Select the router of our current network. Note the NetorkSelectedListener will fire regardless of 
+			//whether we select anything 
+			selectRouter(_network.getRouter().getBssid());
+			
+			database.close();
 		
-		_network.refresh(getActivity());
-		
-		saveCurrentRouter(_network.getRouter().getBssid(), database);
-		
-		populateRouterSpinner(_network.getRouter().getBssid(), database);
-		
-		//Select the router of our current network. Note the NetorkSelectedListener will fire regardless of 
-		//whether we select anything 
-		selectRouter(_network.getRouter().getBssid());
-		
-		database.close();
-		
-		ScanNetwork();
+			ScanNetwork();
+		}
+		else
+		{
+			Toast.makeText(getActivity(), "Network scan aborted: you are not connected to a network", Toast.LENGTH_LONG).show();
+		}
 	}
 	
 	private void ScanNetwork()
@@ -174,13 +213,36 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		
 		LinearLayout pl = (LinearLayout) getActivity().findViewById(R.id.host_fragment_progress_bar_placeholder);
 	    pl.setVisibility(View.VISIBLE);
+	    
+	    _pinger.ping(adapter.GetItems(), DevicesListFragment.this, DevicesListFragment.this);
 	}
 
+	
+	@Override
+	public void onPingComplete(boolean success) 
+	{
+		int i = 0;
+	}
+
+	@Override
+	public void onPingProgress(Device device, boolean success) 
+	{
+		if(success)
+		{
+			ListView listView = (ListView) getActivity().findViewById(R.id.host_list);
+			HostListAdapter adapter = (HostListAdapter)listView.getAdapter();
+			adapter.enableView(device);
+		}
+	}
+	
+	
+	
 	@Override
 	public void onDestroy()
 	{
 		super.onDestroy();
 		_hostEnumerator.cancel();
+		_pinger.cancel();
 	}
 
 	 @Override        
@@ -190,7 +252,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 	 }
 	
 	 
-	 private void populateRouterSpinner(String bssid, Database database)
+	 private void populateRouterSpinner(Database database)
 	 {
 		 Spinner netorkSpinner = (Spinner) getActivity().findViewById(R.id.host_fragment_networks);
 		 
@@ -290,7 +352,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 			Router r = database.getRouterForBssid(routerBssid);
 			List<Device> devices = database.getDevicesForRouter(r.getPrimaryKey());
 			
-			Log.i(TAG, String.format("%d devices found for router with bssid: %s", devices.size(), _network.getRouter().getBssid()));
+			Log.i(TAG, String.format("%d devices found for router with bssid: %s", devices.size(), routerBssid));
 			
 			//add devices to our device list or scan the network if our device list is empty
 			ListView listView = (ListView) getActivity().findViewById(R.id.host_list);
@@ -301,11 +363,17 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 			{
 				adapter.addAll(devices);
 				adapter.notifyDataSetChanged();
+				
+				_pinger.ping(adapter.GetItems(), DevicesListFragment.this, DevicesListFragment.this);
 			}
 			else
 			{
-				_network.refresh(getActivity());
-				ScanNetwork();
+				boolean isConnected =_network.isWifiNetworkConnected(getActivity());
+				if(isConnected)
+				{
+					_network.refresh(getActivity());
+					ScanNetwork();
+				}
 			}
 			
 			database.close();
@@ -314,10 +382,11 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		@Override
 		public void onNothingSelected(AdapterView<?> arg0) {
 			// TODO Auto-generated method stub
-			
 		}
 	
 	}
+
+	
 	
 }
 

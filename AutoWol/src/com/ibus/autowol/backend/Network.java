@@ -23,7 +23,6 @@ import android.util.Log;
 public class Network implements INetwork
 {
     //private SharedPreferences prefs;
-	private Context _ctxt;
     private final String TAG = "Network";
     
     private String _networkStartIp;
@@ -31,7 +30,7 @@ public class Network implements INetwork
     private String _netmaskIp;
     private Device _device;
     private Cidr _cidr;    
-    private String _carrier = null;
+    private String _carrier;
     private WifiInfo wifiInfo;
     private Router router;
     
@@ -48,15 +47,36 @@ public class Network implements INetwork
 		return _networkStartIp;
 	}
 	
+	public Network()
+	{
+	}
 	
-	public void refresh(final Context ctxt)
+	public void refresh(Context context)
     {
-    	_ctxt = ctxt;
     	setDevice();
-    	setWifiInfo();
+    	setWifiInfo(context);
     	setHostBounds();
     }
     
+	public boolean IsGateway(String ipAddress)
+    {
+    	if(ipAddress == null)
+    		return false;
+    	
+    	return ipAddress.equals(router.getIpAddress());
+    }
+    
+    public boolean isMobileNetworkConnected(Context context) 
+    {
+        return isConnectedTo(context, ConnectivityManager.TYPE_WIFI);
+    }
+    
+    public boolean isWifiNetworkConnected(Context context) 
+    {
+        return isConnectedTo(context, ConnectivityManager.TYPE_WIFI);
+    }
+	
+	
 	
     //set ip of the device to the first valid ip found a network interface
     private void setDevice() 
@@ -85,9 +105,9 @@ public class Network implements INetwork
     }
     
 
-    private boolean setWifiInfo() 
+    private boolean setWifiInfo(Context context) 
     {
-        WifiManager wifiManager = (WifiManager) _ctxt.getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         if (wifiManager != null) 
         {
         	_netmaskIp = IpAddress.getStringFromIntSigned(wifiManager.getDhcpInfo().netmask);
@@ -163,26 +183,27 @@ public class Network implements INetwork
         return null;
     }
 
-    
 
     
-    public boolean IsGateway(String ipAddress)
+    
+    
+    private boolean isConnectedTo(Context context, int connectionType) 
     {
-    	if(ipAddress == null)
-    		return false;
-    	
-    	return ipAddress.equals(router.getIpAddress());
+        ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo con = connManager.getNetworkInfo(connectionType);
+        return con.isConnected();
     }
     
-    public boolean isConnectedToNetwork(Context ctxt) 
-    {
-        NetworkInfo nfo = ((ConnectivityManager) ctxt.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-        if (nfo != null) {
-            return nfo.isConnected();
-        }
-        
-        return false;
+    
+
+
+   /* ConnectivityManager connManager1 = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+    NetworkInfo mMobile = connManager1.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+    if (mMobile.isConnected()) {
+        //if internet connected
     }
+    */
     
     
     
@@ -190,8 +211,8 @@ public class Network implements INetwork
     
 
 
-    public boolean getMobileInfo() {
-        TelephonyManager tm = (TelephonyManager) _ctxt.getSystemService(Context.TELEPHONY_SERVICE);
+    public boolean getMobileInfo(Context context) {
+        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         if (tm != null) {
             _carrier = tm.getNetworkOperatorName();
         }

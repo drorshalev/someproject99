@@ -10,13 +10,14 @@ public class Factory
 	private static INetwork _network;
 	private static IHostEnumerator _hostEnumerator;
 		  
-	public static void setNetwork(INetwork creditCardProcessor) {
-		_network = creditCardProcessor;
+	public static void setNetwork(INetwork network) {
+		_network = network;
 	}
 	  
 	public static void setHostEnumerator(IHostEnumerator hostEnumerator) {
 		_hostEnumerator = hostEnumerator;
 	}
+	
 	
 	public static INetwork getNetwork() 
 	{
@@ -39,11 +40,9 @@ public class Factory
 		return _hostEnumerator;
 	}
 	  
-	
-	
-	private void GetFakeNetwork()
+	public static IPinger getPinger()
 	{
-		
+		return new DevicePinger();
 	}
 	  
 }

@@ -81,8 +81,36 @@ public class Device implements Serializable
 		macAddress = device.getMacAddress();
 		nicVendor = device.getNicVendor();
 	}
+
+	public Device getCopy()
+	{
+		Device d = new Device(); 
+		
+		d.setDisplayName(displayName);
+		d.setIpAddress(ipAddress);
+		d.setMacAddress(macAddress);
+		d.setName(displayName);
+		d.setNicVendor(nicVendor);
+		d.setPrimaryKey(primaryKey);
+		d.setRouterId(routerId);
+		
+		return d;
+	}
 	
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
    

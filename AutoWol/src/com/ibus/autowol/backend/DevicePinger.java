@@ -24,26 +24,21 @@ public class DevicePinger implements IPinger
 		public boolean success;
 	}
 	
-	public class Pinger extends AsyncTask<Void, Result, Boolean>
+	public class Pinger extends AsyncTask<Device, Result, Boolean>
 	{
 		List<OnPingCompleteListener> _pingCompleteListeners;
 		List<OnPingProgressListener> _pingProgressListeners;
-		List<Device> _devices;
 		
 		public Pinger()
-		{}
-		
-		public Pinger(List<Device> devices)
 		{
-			_devices =devices;
 			_pingCompleteListeners = new ArrayList<OnPingCompleteListener>();
 			_pingProgressListeners = new ArrayList<OnPingProgressListener>();
 		}
 		
 		@Override
-		public Boolean doInBackground(Void... params) 
+		public Boolean doInBackground(Device... params) 
 		{
-			for(Device d : _devices)
+			for(Device d : params)
 			{
 				boolean s = Shell.ping(d.getIpAddress());
 				publishProgress(new Result(d, s));
@@ -92,20 +87,17 @@ public class DevicePinger implements IPinger
 			Log.i(TAG, "Network scan failed: scan thread already running");
 			return;
 		}
-		pinger = new Pinger(devices);
+		
+		List<Device> dl = new ArrayList<Device>();
+		for(Device d : devices)
+			dl.add(d.getCopy());
+		
+		pinger = new Pinger();
 		pinger.addOnPingCompleteListener(completeListener);
 		pinger.addOnPingProgressListener(progressListener);
-		pinger.execute();
+		pinger.execute(dl.toArray(new Device[dl.size()]));
 	}
 
-	/*@Override
-	public void ping(Device device, OnPingCompleteListener completeListener, OnPingProgressListener progressListener)
-	{
-		List<Device> devices = new ArrayList<Device>();
-		devices.add(device);
-		
-		ping(devices, completeListener, progressListener);
-	}*/
 	
 	
 	@Override
