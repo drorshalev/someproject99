@@ -1,12 +1,7 @@
 package com.ibus.autowol.mock;
 
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
 
-import com.ibus.autowol.backend.Cidr;
-import com.ibus.autowol.backend.Device;
 import com.ibus.autowol.backend.INetwork;
 import com.ibus.autowol.backend.IpAddress;
 import com.ibus.autowol.backend.MacAddress;
@@ -20,6 +15,8 @@ public class MockNetwork implements INetwork
 	String _networkStartIp;
 	Router _router = new Router();
 	boolean _isConnectedToNetwork;
+	boolean _isMobileNetworkConnected;
+	boolean _isWifiNetworkConnected;
 	
 	public MockNetwork()
 	{
@@ -78,8 +75,7 @@ public class MockNetwork implements INetwork
 		_networkStartIp = ip;	
 	}
 	
-	
-	public void refresh(final Context ctxt){}
+	public void refresh(Context context){}
 	
 	public boolean IsGateway(String ipAddress)
     {
@@ -89,15 +85,31 @@ public class MockNetwork implements INetwork
     	return ipAddress.equals(_router.getIpAddress());
     }
 
-    public boolean isConnectedToNetwork(Context ctxt) 
+	
+	
+	
+	@Override
+	public boolean isMobileNetworkConnected(Context context) {
+		return _isMobileNetworkConnected;
+	}
+	
+	public void setIsMobileNetworkConnected(boolean isConnected)
     {
-        return _isConnectedToNetwork;
+		_isMobileNetworkConnected = isConnected;
     }
-    
-    public void setIsConnectedToNetwork(boolean isConnected)
+	
+
+	@Override
+	public boolean isWifiNetworkConnected(Context context) {
+		// TODO Auto-generated method stub
+		return _isWifiNetworkConnected;
+	}
+	
+	public void setIsWifiNetworkConnected(boolean isConnected)
     {
-    	_isConnectedToNetwork = isConnected;
+		_isWifiNetworkConnected = isConnected;
     }
+	
 }
 
 
