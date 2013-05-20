@@ -42,6 +42,9 @@ public class DevicePinger implements IPinger
 			{
 				boolean s = Shell.ping(d.getIpAddress());
 				publishProgress(new Result(d, s));
+				
+				if(isCancelled())
+					return false;
 			}
 			
 		    return true;
