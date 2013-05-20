@@ -47,40 +47,47 @@ public class NetworkScanner implements IHostEnumerator
 			Long start = IpAddress.getUnsignedLongFromString(_network.getNetworkStartIp());
 			Long end = IpAddress.getUnsignedLongFromString(_network.getNetworkEndIp());
 			List<Device> hosts = null;
-			try 
-			{
-				int ii = 0;
-				for (long i = start; i <= end; i++) 
+			
+			int ii = 0;
+			for (long i = start; i <= end; i++) 
+			{	
+				Udp.probe(IpAddress.getStringFromLongUnsigned(i));
+				  
+				publishProgress(new Result(null, ii++));
+				
+				try 
 				{
-			      Udp.probe(IpAddress.getStringFromLongUnsigned(i));
-			      
-			      publishProgress(new Result(null, ii++));
-			      Thread.sleep(10);
-			    }
-				
-				Log.i(TAG, "successfully completed probing devices on network");
-				
-				hosts = Arp.EnumerateHosts();
-				for(Device h : hosts)
+					Thread.sleep(10);
+				} catch (InterruptedException e) 
 				{
-					String n = InetAddressManager.GetHostName(h.getIpAddress());
-					if(n == null || n == h.getIpAddress())
-						n = Jcifs.getHostName(h.getIpAddress());
-					h.setName(n);
-				
-					publishProgress(new Result(h, 254));
+					e.printStackTrace();
 				}
 				
-				Log.i(TAG, "successfully completed search for devices in arp cache");
+				if(isCancelled())
+					return false;
+		    }
 			
-			} catch (InterruptedException e) 
+			Log.i(TAG, "successfully completed probing devices on network");
+			
+			hosts = Arp.EnumerateHosts();
+			for(Device h : hosts)
 			{
-				e.printStackTrace();
-			}
-		
+				String n = InetAddressManager.GetHostName(h.getIpAddress());
+				if(n == null || n == h.getIpAddress())
+					n = Jcifs.getHostName(h.getIpAddress());
+				h.setName(n);
 			
+				publishProgress(new Result(h, 254));
+				
+				if(isCancelled())
+					return false;
+			}
+			
+			Log.i(TAG, "successfully completed search for devices in arp cache");
+		
 		    return true;
 		}	
+		
 		
 		@Override
 		public void onProgressUpdate (Result... result)
