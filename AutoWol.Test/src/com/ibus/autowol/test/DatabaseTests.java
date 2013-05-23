@@ -31,7 +31,7 @@ public class DatabaseTests extends AndroidTestCase {
 	public void testSaveDevice()
 	{
 		Device host = GetRandomDevice();
-		db.saveDevice(host, 1);
+		db.addDevice(host, 1);
 		List<Device> hl = db.getAllDevices();
         
 		assertTrue(hl.size() > 0);
@@ -42,7 +42,7 @@ public class DatabaseTests extends AndroidTestCase {
 	public void testSaveRouter()
 	{
 		Router r = GetRandomRouter();
-		db.saveRouter(r);
+		db.addRouter(r);
 		List<Router> hl = db.getAllRouters();
         
 		assertTrue(hl.size() > 0);
@@ -54,10 +54,10 @@ public class DatabaseTests extends AndroidTestCase {
 		Device d1 = GetRandomDevice();
 		Device d2 = GetRandomDevice();
 		
-		int pk = db.saveRouter(r);
+		int pk = db.addRouter(r);
 		
-		db.saveDevice(d1, pk);
-		db.saveDevice(d2, pk);
+		db.addDevice(d1, pk);
+		db.addDevice(d2, pk);
 		
 		List<Device> dl = db.getDevicesForRouter(pk);
 		
@@ -71,9 +71,9 @@ public class DatabaseTests extends AndroidTestCase {
 		Device d1 = GetRandomDevice();
 		Device d2 = GetRandomDevice();
 		
-		int rpk = db.saveRouter(r);
-		int d1pk = db.saveDevice(d1, rpk);
-		int d2pk = db.saveDevice(d2, rpk);
+		int rpk = db.addRouter(r);
+		int d1pk = db.addDevice(d1, rpk);
+		int d2pk = db.addDevice(d2, rpk);
 		
 		List<Device> dl = db.getDevicesForRouter(rpk);
 		
@@ -95,7 +95,7 @@ public class DatabaseTests extends AndroidTestCase {
 		Router r1 = GetRandomRouter();
 		r1.setMacAddress("1 1");
 		
-		db.saveRouter(r1);
+		db.addRouter(r1);
 		
 		Router r2 = db.getRouterForBssid("1 1");
 		assertTrue(r2 != null);
@@ -112,9 +112,9 @@ public class DatabaseTests extends AndroidTestCase {
 		Device d1 = GetRandomDevice();
 		Device d2 = GetRandomDevice();
 		
-		int rpk = db.saveRouter(r);
-		int d1pk = db.saveDevice(d1, rpk);
-		int d2pk = db.saveDevice(d2, rpk);
+		int rpk = db.addRouter(r);
+		int d1pk = db.addDevice(d1, rpk);
+		int d2pk = db.addDevice(d2, rpk);
 		
 		Router r2 = db.getRouter(rpk);
 		Device d3 = db.getDevice(d1pk);
@@ -124,7 +124,7 @@ public class DatabaseTests extends AndroidTestCase {
 		assertTrue(d3 != null);
 		assertTrue(d4 != null);
 		
-		db.deleteDevicesForRoputer(rpk);
+		db.deleteDevicesForRouter(rpk);
 		
 		Device d5 = db.getDevice(d1pk);
 		Device d6 = db.getDevice(d2pk);
@@ -142,8 +142,8 @@ public class DatabaseTests extends AndroidTestCase {
 		devl.add(GetRandomDevice());
 		devl.add(GetRandomDevice());
 		
-		int rpk = db.saveRouter(r);
-		db.saveDevicesForRoputer(devl, rpk);
+		int rpk = db.addRouter(r);
+		db.saveDevicesForRouter(devl, rpk);
 		
 		List<Device> devl2 = db.getDevicesForRouter(rpk);
 		
