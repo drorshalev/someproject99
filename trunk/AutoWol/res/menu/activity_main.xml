@@ -3,7 +3,7 @@
    
     <item android:id="@+id/activity_main_scan"  
         android:title="@string/scan_network_button_title"
-        android:showAsAction="always|collapseActionView"
+        android:showAsAction="always"
         android:icon="@drawable/ic_action_refresh"></item>
     
     
