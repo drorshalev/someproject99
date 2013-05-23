@@ -87,7 +87,7 @@ public class DevicePinger implements IPinger
 	public void ping(List<Device> devices, OnPingCompleteListener completeListener, OnPingProgressListener progressListener)
 	{
 		if(pinger.getStatus() == AsyncTask.Status.RUNNING){
-			Log.i(TAG, "Network scan failed: scan thread already running");
+			Log.i(TAG, "Ping failed: ping thread already running");
 			return;
 		}
 		

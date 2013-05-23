@@ -42,9 +42,9 @@ public class MainActivity extends SherlockFragmentActivity
     {
     	getSupportMenuInflater().inflate(R.menu.activity_main, menu);
     	
-    	MenuItem scan = (MenuItem)menu.findItem(R.id.activity_main_scan);
+    	//MenuItem scan = (MenuItem)menu.findItem(R.id.activity_main_scan);
     	
-    	scan.setActionView(R.layout.progress_indicator);
+    	//scan.setActionView(R.layout.progress_indicator);
     	//scan.setActionView(null);
     	
     	//scan.collapseActionView();

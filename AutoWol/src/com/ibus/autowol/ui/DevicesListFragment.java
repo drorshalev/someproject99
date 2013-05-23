@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,6 +36,7 @@ import com.ibus.autowol.backend.WolSender;
 
 public class DevicesListFragment extends SherlockFragment implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, OnPingProgressListener, OnPingCompleteListener
 {
+	ProgressDialog _progressDialog;
 	IPinger _pinger;
 	INetwork _network;
 	IHostEnumerator _hostEnumerator;
@@ -87,8 +90,8 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		{
 			_network.refresh(getActivity());
 			
-			//get or create router
-			saveCurrentRouter(_network.getRouter().getBssid(), database);
+			//update or create router
+			database.saveRouter(_network.getRouter());
 		
 			//populate network spinner with all of our routers
 			populateRouterSpinner(database);
@@ -132,8 +135,8 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 			
 			_network.refresh(getActivity());
 
-			//get or create router
-			saveCurrentRouter(_network.getRouter().getBssid(), database);
+			//update or create router
+			database.saveRouter(_network.getRouter());
 
 			//populate network spinner with all of our routers again since the list might have changed
 			populateRouterSpinner(database);
@@ -154,14 +157,13 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 	
 	private void ScanNetwork()
 	{
-		ProgressBar pb = (ProgressBar) getActivity().findViewById(R.id.host_fragment_progress_bar);
-		pb.setMax(255);
-		pb.setProgress(0);
-	    pb.setVisibility(View.VISIBLE);
+		_progressDialog = new ProgressDialog(getActivity(), AlertDialog.THEME_HOLO_DARK);
+		_progressDialog.setTitle("Scanning network...");
+		_progressDialog.setMessage("Please wait.");
+		_progressDialog.setCancelable(false);
+		_progressDialog.setIndeterminate(true);
+		_progressDialog.show();
 		
-	    LinearLayout pl = (LinearLayout) getActivity().findViewById(R.id.host_fragment_progress_bar_placeholder);
-	    pl.setVisibility(View.GONE);
-	   
 		_hostEnumerator.scan(_network, this, this);
 	}
 	
@@ -174,9 +176,6 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 	@Override
 	public void onScanProgress(Device host, int progress) 
 	{
-		ProgressBar pb = (ProgressBar) getActivity().findViewById(R.id.host_fragment_progress_bar);
-		pb.incrementProgressBy(progress);
-		
 		if(host != null)
 		{
 			ListView listView = (ListView) getActivity().findViewById(R.id.host_list);
@@ -203,16 +202,12 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		
 		Router r = database.getRouterForBssid(_network.getRouter().getBssid());
 		
-		database.deleteDevicesForRoputer(r.getPrimaryKey());
-		database.saveDevicesForRoputer(adapter.GetItems(), r.getPrimaryKey());
+		//add or update all devices in our adapter to our db 
+		database.saveDevicesForRouter(adapter.GetItems(), r.getPrimaryKey());
 		
 		database.close();
 		
-		ProgressBar pb = (ProgressBar) getActivity().findViewById(R.id.host_fragment_progress_bar);
-		pb.setVisibility(View.GONE);
-		
-		LinearLayout pl = (LinearLayout) getActivity().findViewById(R.id.host_fragment_progress_bar_placeholder);
-	    pl.setVisibility(View.VISIBLE);
+		_progressDialog.dismiss();
 	    
 	    _pinger.ping(adapter.GetItems(), DevicesListFragment.this, DevicesListFragment.this);
 	}
@@ -261,23 +256,6 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		 netorkSpinner.setAdapter(ntwkAdapter);
 	 }
 
-
-	 private boolean saveCurrentRouter(String bssid, Database database)
-	 {
-		 Router router = database.getRouterForBssid(bssid);
-		 if(router ==null)
-		 {
-			 database.saveRouter(_network.getRouter());
-			 Log.i(TAG, "This network is new.  New router saved to db.");
-			 return true; //flag router was saved
-		 }
-		 else
-		 {
-			 Log.i(TAG, "This network is known.  Existing router retrieved from db.");
-		 }
-		 
-		 return false; //router was not saved
-	 }
 
 	 private void selectRouter(String bssid)
 	 { 
