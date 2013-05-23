@@ -10,6 +10,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 
 public class Database {
@@ -131,6 +132,9 @@ public class Database {
 	  private static final String SQL_GET_DEVICE = 
 			  "select * from " + TABLE_DEVICE + " where " + COLUMN_DEVICE_ID + "=?";
 	  
+	  private static final String SQL_GET_DEVICE_FOR_MAC = 
+			  "select * from " + TABLE_DEVICE + " where " + COLUMN_DEVICE_MAC + "=?";
+	  
 	  private static final String SQL_GET_DEVICES_FOR_ROUTER = 
 			  "select * from " + TABLE_DEVICE + " where " + COLUMN_DEVICE_ROUTER_ID + "=?";
 	  
@@ -167,17 +171,47 @@ public class Database {
 	  }
 	  
 	  
-	  public int saveDevice(Device device, int routerId)
+	  public int addDevice(Device device, int routerId)
 	  {
-		  ContentValues contentValues = new ContentValues();
-		  contentValues.put(COLUMN_DEVICE_ROUTER_ID, routerId);
-		  contentValues.put(COLUMN_DEVICE_NAME, device.getName());
-		  contentValues.put(COLUMN_DEVICE_DISPLAY_NAME, device.getDisplayName());
-		  contentValues.put(COLUMN_DEVICE_IP, device.getIpAddress());
-		  contentValues.put(COLUMN_DEVICE_MAC, device.getMacAddress());
-		  contentValues.put(COLUMN_DEVICE_NIC_VENDOR, device.getNicVendor());
-		  
+		  device.setRouterId(routerId);
+		  ContentValues contentValues = getDeviceContentValues(device);
 		  return (int)db.insert(TABLE_DEVICE, null, contentValues);
+	  }
+	  
+	  
+	  public int updateDevice(Device device)
+	  {
+		  ContentValues cv = getDeviceContentValues(device);
+		  
+		  String[] params = {device.getMacAddress()};  
+		  return (int)db.update(TABLE_DEVICE, cv, COLUMN_DEVICE_MAC + "=?", params);
+	  }
+	  
+	  
+	  public int saveDevice(Device device, int routerPk)
+	  {
+		  Device d = getDeviceForMac(device.getMacAddress());
+		  if(d == null)
+		  {
+			  return addDevice(device, routerPk);
+		  }
+		  else
+		  {
+			  device.setRouterId(routerPk);
+			  return updateDevice(device);
+		  }
+	  }
+	  
+	  
+	  public Device getDeviceForMac(String mac) 
+	  {
+		  String[] params = {mac};
+		  Cursor cursor = db.rawQuery(SQL_GET_DEVICE_FOR_MAC, params);
+		  
+		  if(cursor.moveToFirst())
+			  return cursorRowToDevice(cursor);
+		  
+		  return null;
 	  }
 	  
 	  
@@ -192,8 +226,6 @@ public class Database {
 		  return devices;
 	  }
 	  
-	  
-	  
 	  public ArrayList<Device> getDevicesForRouter(int routerId) 
 	  {
 		  ArrayList<Device> devices = new ArrayList<Device>();
@@ -206,39 +238,6 @@ public class Database {
 		  return devices;
 	  }
 	  
-	  
-	  private ArrayList<Device> cursorToDevices(Cursor cursor)
-	  {
-		  ArrayList<Device> pal = new ArrayList<Device>();
-		  
-		  if(cursor.moveToFirst())
-		  {
-			do {
-				Device h = cursorRowToDevice(cursor);
-				pal.add(h);
-		  	} 
-			while(cursor.moveToNext());
-			  
-		  }
-		  cursor.close();
-			
-		  return pal;
-	  }
-	  
-	  private Device cursorRowToDevice(Cursor cursor)
-	  {
-			Device h = new Device();
-			h.setPrimaryKey(cursor.getInt(ORDINAL_DEVICE_ID));
-			h.setRouterId(cursor.getInt(ORDINAL_DEVICE_ROUTER_ID));
-			h.setName(cursor.getString(ORDINAL_DEVICE_NAME));
-			h.setDisplayName(cursor.getString(ORDINAL_DEVICE_DISPLAY_NAME));
-			h.setIpAddress(cursor.getString(ORDINAL_DEVICE_IP));
-			h.setMacAddress(cursor.getString(ORDINAL_DEVICE_MAC));
-			h.setNicVendor(cursor.getString(ORDINAL_DEVICE_NIC_VENDOR));
-			
-			return  h;
-	  }
-	  
 	  public Device getDevice(int deviceId) 
 	  {
 		  String[] params = {((Integer)deviceId).toString()};
@@ -249,21 +248,33 @@ public class Database {
 		  
 		  return null;
 	  }
-	  
-	  
-	  
+	 
 	  
 	  public int saveRouter(Router router)
 	  {
-		  ContentValues contentValues = new ContentValues();
+		  Router r = getRouterForBssid(router.getBssid());
+		  if(r == null)
+		  {
+			  return addRouter(router);
+		  }
+		  else
+		  {
+			  return updateRouter(router);
+		  }
+	  }
+	  
+	  public int addRouter(Router router)
+	  {
+		  ContentValues cv = getRouterContentValues(router);;
+		  return (int)db.insert(TABLE_ROUTER, null, cv);
+	  }
+	  
+	  public int updateRouter(Router router)
+	  {
+		  ContentValues cv = getRouterContentValues(router);
 		  
-		  contentValues.put(COLUMN_ROUTER_SSID, router.getSsid());
-		  contentValues.put(COLUMN_ROUTER_IP, router.getIpAddress());
-		  contentValues.put(COLUMN_ROUTER_MAC, router.getMacAddress());
-		  contentValues.put(COLUMN_ROUTER_BSSID, router.getBssid());
-		  contentValues.put(COLUMN_ROUTER_NIC_VENDOR, router.getNicVendor());
-		  
-		  return (int)db.insert(TABLE_ROUTER, null, contentValues);
+		  String[] params = {router.getBssid()};  
+		  return (int)db.update(TABLE_ROUTER, cv, COLUMN_ROUTER_BSSID + "=?", params);
 	  }
 	  
 	  
@@ -286,20 +297,6 @@ public class Database {
 		  cursor.close();
 			
 		  return pal;
-	  }
-	  
-	  
-	  public Router cursorRowToRouter(Cursor cursor) 
-	  {
-		  	Router h = new Router();
-			h.setPrimaryKey(cursor.getInt(ORDINAL_ROUTER_ID));
-			h.setSsid(cursor.getString(ORDINAL_ROUTER_SSID));
-			h.setIpAddress(cursor.getString(ORDINAL_ROUTER_IP));
-			h.setMacAddress(cursor.getString(ORDINAL_ROUTER_MAC));
-			h.setBssid(cursor.getString(ORDINAL_ROUTER_BSSID));
-			h.setNicVendor(cursor.getString(ORDINAL_ROUTER_NIC_VENDOR));
-			
-			return h;
 	  }
 	  
 	  
@@ -337,7 +334,7 @@ public class Database {
 		  return null;
 	  }
 	  
-	  public int deleteDevicesForRoputer(int routerId) 
+	  public int deleteDevicesForRouter(int routerId) 
 	  {
 		  String[] params = {((Integer)routerId).toString()};
 		  
@@ -348,7 +345,7 @@ public class Database {
 	  }
 
 	  
-	  public void saveDevicesForRoputer(List<Device> devices, int routerId) 
+	  public void saveDevicesForRouter(List<Device> devices, int routerId) 
 	  {
 		  for(Device d : devices)
 		  {
@@ -357,6 +354,89 @@ public class Database {
 	  }
 	  
 	  
+	  
+	  //utilities /////////////////////////////////////////////////////////////
+	  
+
+	  
+	  private ArrayList<Device> cursorToDevices(Cursor cursor)
+	  {
+		  ArrayList<Device> pal = new ArrayList<Device>();
+		  
+		  if(cursor.moveToFirst())
+		  {
+			do {
+				Device h = cursorRowToDevice(cursor);
+				pal.add(h);
+		  	} 
+			while(cursor.moveToNext());
+			  
+		  }
+		  cursor.close();
+			
+		  return pal;
+	  }
+	  
+	  private Device cursorRowToDevice(Cursor cursor)
+	  {
+			Device h = new Device();
+			h.setPrimaryKey(cursor.getInt(ORDINAL_DEVICE_ID));
+			h.setRouterId(cursor.getInt(ORDINAL_DEVICE_ROUTER_ID));
+			h.setName(cursor.getString(ORDINAL_DEVICE_NAME));
+			h.setDisplayName(cursor.getString(ORDINAL_DEVICE_DISPLAY_NAME));
+			h.setIpAddress(cursor.getString(ORDINAL_DEVICE_IP));
+			h.setMacAddress(cursor.getString(ORDINAL_DEVICE_MAC));
+			h.setNicVendor(cursor.getString(ORDINAL_DEVICE_NIC_VENDOR));
+			
+			return  h;
+	  }
+	  
+
+	  private Router cursorRowToRouter(Cursor cursor) 
+	  {
+		  	Router h = new Router();
+			h.setPrimaryKey(cursor.getInt(ORDINAL_ROUTER_ID));
+			h.setSsid(cursor.getString(ORDINAL_ROUTER_SSID));
+			h.setIpAddress(cursor.getString(ORDINAL_ROUTER_IP));
+			h.setMacAddress(cursor.getString(ORDINAL_ROUTER_MAC));
+			h.setBssid(cursor.getString(ORDINAL_ROUTER_BSSID));
+			h.setNicVendor(cursor.getString(ORDINAL_ROUTER_NIC_VENDOR));
+			
+			return h;
+	  }
+	  
+	  
+	  private ContentValues getRouterContentValues(Router router)
+	  {
+		  ContentValues contentValues = new ContentValues();
+		  
+		  contentValues.put(COLUMN_ROUTER_SSID, router.getSsid());
+		  contentValues.put(COLUMN_ROUTER_IP, router.getIpAddress());
+		  contentValues.put(COLUMN_ROUTER_MAC, router.getMacAddress());
+		  contentValues.put(COLUMN_ROUTER_BSSID, router.getBssid());
+		  contentValues.put(COLUMN_ROUTER_NIC_VENDOR, router.getNicVendor());
+		  
+		  return contentValues;
+	  }
+	  
+
+	  
+	  public ContentValues getDeviceContentValues(Device device)
+	  {
+		  ContentValues contentValues = new ContentValues();
+		  
+		  contentValues.put(COLUMN_DEVICE_ROUTER_ID, device.getRouterId());
+		  contentValues.put(COLUMN_DEVICE_NAME, device.getName());
+		  contentValues.put(COLUMN_DEVICE_DISPLAY_NAME, device.getDisplayName());
+		  contentValues.put(COLUMN_DEVICE_IP, device.getIpAddress());
+		  contentValues.put(COLUMN_DEVICE_MAC, device.getMacAddress());
+		  contentValues.put(COLUMN_DEVICE_NIC_VENDOR, device.getNicVendor());
+		  
+		  return contentValues;
+	  }
+	  
+	  
+	// Helper /////////////////////////////////////////////////////////////
 	  
 	  
 	//just for testing
