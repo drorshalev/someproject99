@@ -18,12 +18,11 @@ public class RefreshDb extends AndroidTestCase {
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		
-		
 		db.close();
 	}
 
 	
-	public void testSaveDevice()
+	public void testDeleteDb()
 	{
 		db.deleteDB();
 		assertTrue(true);
