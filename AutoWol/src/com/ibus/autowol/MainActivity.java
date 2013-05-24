@@ -7,14 +7,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.widget.ProgressBar;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.ibus.autowol.backend.Network;
+import com.ibus.autowol.backend.PersistantPinger;
 import com.ibus.autowol.ui.ActivityListItem;
 import com.ibus.autowol.ui.DevicesListFragment;
 import com.ibus.autowol.ui.NavigationSpinnerAdapter;
@@ -35,6 +34,9 @@ public class MainActivity extends SherlockFragmentActivity
 
         InitialiseActionBar();
         _scanStartListeners = new ArrayList<OnScanStartListener>();
+        
+        PersistantPinger p = new PersistantPinger();
+        p.ping(null, null, null);
     }
    
     @Override
