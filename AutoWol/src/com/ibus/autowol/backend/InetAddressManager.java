@@ -36,16 +36,14 @@ public abstract class InetAddressManager
 	
 
 	/*this seems to work differently to the native ping available in a linux / windows console.  will fail on a windows host that has a a firewall up*/
-	/*public boolean javaPing(String ip)
+	public static boolean ping(String ip)
 	{
 		try 
 		{
 			InetAddress in = InetAddress.getByName(ip);
 			
-			 if (in.isReachable(5000)) 
+			 if (in.isReachable(1000)) 
 			 {
-				 String h = in.getHostName();
-				 
 				 Log.i("HostEnumerator.Pinged", ip +  " was pinged successfully"); 
 				 return true;
 			 }
@@ -61,7 +59,7 @@ public abstract class InetAddressManager
 		}
 		
 		return false;
-	}*/
+	}
 	
 	
 

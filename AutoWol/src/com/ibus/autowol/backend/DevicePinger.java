@@ -13,18 +13,9 @@ public class DevicePinger implements IPinger
 {
 	private final String TAG = "AutoWol-NetworkScanner";
 
-	public class Result
-	{
-		public Result(Device device, boolean success)
-		{
-			this.device = device;
-			this.success = success;
-		}
-		public Device device;
-		public boolean success;
-	}
 	
-	public class Pinger extends AsyncTask<Device, Result, Boolean>
+	
+	public class Pinger extends AsyncTask<Device, PingResult, Boolean>
 	{
 		List<OnPingCompleteListener> _pingCompleteListeners;
 		List<OnPingProgressListener> _pingProgressListeners;
@@ -41,7 +32,7 @@ public class DevicePinger implements IPinger
 			for(Device d : params)
 			{
 				boolean s = Shell.ping(d.getIpAddress());
-				publishProgress(new Result(d, s));
+				publishProgress(new PingResult(d, s));
 				
 				if(isCancelled())
 					return false;
@@ -51,13 +42,13 @@ public class DevicePinger implements IPinger
 		}	
 		
 		@Override
-		public void onProgressUpdate (Result... result)
+		public void onProgressUpdate (PingResult... result)
 		{
 			Log.i(TAG, "Ping complete");
 			
 			for (OnPingProgressListener listener : _pingProgressListeners) 
 			{
-				listener.onPingProgress(result[0].device, result[0].success);
+				listener.onPingProgress(result[0]);
 	        }
 		}
 		
@@ -83,7 +74,7 @@ public class DevicePinger implements IPinger
 	
 	Pinger pinger = new Pinger();
 	
-	@Override
+	
 	public void ping(List<Device> devices, OnPingCompleteListener completeListener, OnPingProgressListener progressListener)
 	{
 		if(pinger.getStatus() == AsyncTask.Status.RUNNING){
@@ -100,16 +91,34 @@ public class DevicePinger implements IPinger
 		pinger.addOnPingProgressListener(progressListener);
 		pinger.execute(dl.toArray(new Device[dl.size()]));
 	}
+	
+	@Override
+	public void start(List<Device> devices)
+	{
+		
+	}
 
 	
 	
 	@Override
-	public void cancel() 
+	public void stop() 
 	{
 		if(pinger.getStatus() == AsyncTask.Status.RUNNING)
 			pinger.cancel(true);
 		
 		Log.i(TAG, "Network scan canceled");
+	}
+
+	@Override
+	public void addOnPingCompleteListener(OnPingCompleteListener listener) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addOnPingProgressListener(OnPingProgressListener listener) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	
