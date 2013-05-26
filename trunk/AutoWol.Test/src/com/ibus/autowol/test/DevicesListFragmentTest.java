@@ -1,20 +1,15 @@
 package com.ibus.autowol.test;
 
-import com.ibus.autowol.MainActivity;
-import com.ibus.autowol.R;
-import com.ibus.autowol.backend.Database;
-import com.ibus.autowol.backend.Factory;
-import com.ibus.autowol.backend.HostListAdapter;
-import com.ibus.autowol.backend.Network;
-import com.ibus.autowol.mock.MockNetwork;
-import com.ibus.autowol.mock.MockNetworkScanner;
-import com.ibus.autowol.ui.NetworkSpinnerAdapter;
-
-import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
-import android.util.Log;
 import android.widget.ListView;
 import android.widget.Spinner;
+
+import com.ibus.autowol.MainActivity;
+import com.ibus.autowol.R;
+import com.ibus.autowol.backend.Factory;
+import com.ibus.autowol.backend.HostListAdapter;
+import com.ibus.autowol.mock.MockNetwork;
+import com.ibus.autowol.mock.MockNetworkScanner;
 
 public class DevicesListFragmentTest extends ActivityInstrumentationTestCase2<MainActivity>
 {
