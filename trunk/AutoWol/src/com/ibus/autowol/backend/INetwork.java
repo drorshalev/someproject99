@@ -7,7 +7,6 @@
 package com.ibus.autowol.backend;
 
 import android.content.Context;
-import android.net.ConnectivityManager;
 
 public interface INetwork 
 {

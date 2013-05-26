@@ -13,9 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -31,7 +29,6 @@ import com.ibus.autowol.backend.HostListAdapter;
 import com.ibus.autowol.backend.IHostEnumerator;
 import com.ibus.autowol.backend.INetwork;
 import com.ibus.autowol.backend.IPinger;
-import com.ibus.autowol.backend.PersistantPinger;
 import com.ibus.autowol.backend.PingResult;
 import com.ibus.autowol.backend.Router;
 import com.ibus.autowol.backend.WolSender;
