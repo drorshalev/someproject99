@@ -31,22 +31,23 @@ import com.ibus.autowol.backend.HostListAdapter;
 import com.ibus.autowol.backend.IHostEnumerator;
 import com.ibus.autowol.backend.INetwork;
 import com.ibus.autowol.backend.IPinger;
+import com.ibus.autowol.backend.PersistantPinger;
+import com.ibus.autowol.backend.PingResult;
 import com.ibus.autowol.backend.Router;
 import com.ibus.autowol.backend.WolSender;
 
 public class DevicesListFragment extends SherlockFragment implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, OnPingProgressListener, OnPingCompleteListener
 {
 	ProgressDialog _progressDialog;
-	IPinger _pinger;
 	INetwork _network;
 	IHostEnumerator _hostEnumerator;
 	private final static String TAG = "AutoWol-DevicesListFragment";
+	IPinger _pinger;
 	
 	public DevicesListFragment()
 	{
 		_network = Factory.getNetwork();
 		_hostEnumerator = Factory.getHostEnumerator();
-		_pinger = Factory.getPinger();
 	}
 	
 	@Override
@@ -111,12 +112,90 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 	}
 	
 	@Override
+	public void onResume() 
+	{
+		//fragment is visible here
+		super.onResume();
+		
+		_pinger = Factory.getPinger();
+        _pinger.addOnPingCompleteListener(this);
+        _pinger.addOnPingProgressListener(this);
+        
+        ListView listView = (ListView) getActivity().findViewById(R.id.host_list);
+		HostListAdapter adapter = (HostListAdapter)listView.getAdapter();
+        _pinger.start(adapter.GetItems());
+		
+		Log.i(TAG, "onResume");
+	}
+
+	
+	@Override
+	public void onStop() 
+	{
+		//fragment is hidden here
+		super.onStop();
+
+		_pinger.stop();		
+		Log.i(TAG, "onStop");
+	}
+		
+
+	@Override
+	public void onPingComplete(boolean success) 
+	{
+		Log.i(TAG, "Ping complete");
+	}
+
+	@Override
+	public void onPingProgress(PingResult result) 
+	{
+		Log.i(TAG, "Ping progress called");
+		
+		//thread may call into this method after onDestroy is called!!!!!
+		if(getActivity() == null){
+			Log.i(TAG, "getActivity is null ");
+			return;
+		}
+		
+		ListView listView = (ListView) getActivity().findViewById(R.id.host_list);
+		HostListAdapter adapter = (HostListAdapter)listView.getAdapter();
+		if(result.success)
+		{
+			adapter.enableView(result.device);
+		}
+		else
+		{
+			adapter.dissableView(result.device);
+		}
+	}
+	
+	
+	
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+		_hostEnumerator.cancel();
+	}
+	
+	
+
+	 @Override        
+	 public void onSaveInstanceState(Bundle SavedInstanceState) 
+	 {
+		 super.onSaveInstanceState(SavedInstanceState);
+		 Log.i(TAG, "Saving instance state");
+	 }
+	
+	
+	@Override
 	public void onAttach (Activity activity)
 	{
 		super.onAttach(activity);
 		Activity ac = activity;
 	}
 	
+	@Override
 	public void onDetach ()
 	{
 		super.onDetach();
@@ -155,23 +234,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		}
 	}
 	
-	private void ScanNetwork()
-	{
-		_progressDialog = new ProgressDialog(getActivity(), AlertDialog.THEME_HOLO_DARK);
-		_progressDialog.setTitle("Scanning network...");
-		_progressDialog.setMessage("Please wait.");
-		_progressDialog.setCancelable(false);
-		_progressDialog.setIndeterminate(true);
-		_progressDialog.show();
-		
-		_hostEnumerator.scan(_network, this, this);
-	}
 	
-	@Override
-	public void onResume() 
-	{
-		super.onResume();
-	} 
 	
 	@Override
 	public void onScanProgress(Device host, int progress) 
@@ -208,45 +271,34 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		database.close();
 		
 		_progressDialog.dismiss();
-	    
-	    _pinger.ping(adapter.GetItems(), DevicesListFragment.this, DevicesListFragment.this);
 	}
 
 	
-	@Override
-	public void onPingComplete(boolean success) 
-	{
-		int i = 0;
-	}
+	
+	
+	
 
-	@Override
-	public void onPingProgress(Device device, boolean success) 
-	{
-		if(success)
-		{
-			ListView listView = (ListView) getActivity().findViewById(R.id.host_list);
-			HostListAdapter adapter = (HostListAdapter)listView.getAdapter();
-			adapter.enableView(device);
-		}
-	}
 	
-	
-	
-	@Override
-	public void onDestroy()
-	{
-		super.onDestroy();
-		_hostEnumerator.cancel();
-		_pinger.cancel();
-	}
 
-	 @Override        
-	 public void onSaveInstanceState(Bundle SavedInstanceState) {
-		 super.onSaveInstanceState(SavedInstanceState);
-		 Log.i(TAG, "Saving instance state");
-	 }
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	// Utilities //////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	 
+	
+	private void ScanNetwork()
+	{
+		_progressDialog = new ProgressDialog(getActivity(), AlertDialog.THEME_HOLO_DARK);
+		_progressDialog.setTitle("Scanning network...");
+		_progressDialog.setMessage("Please wait.");
+		_progressDialog.setCancelable(false);
+		_progressDialog.setIndeterminate(true);
+		_progressDialog.show();
+		
+		_hostEnumerator.scan(_network, this, this);
+	}
+	
+	
+	
 	 private void populateRouterSpinner(Database database)
 	 {
 		 Spinner netorkSpinner = (Spinner) getActivity().findViewById(R.id.host_fragment_networks);
@@ -341,8 +393,6 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 			{
 				adapter.addAll(devices);
 				adapter.notifyDataSetChanged();
-				
-				_pinger.ping(adapter.GetItems(), DevicesListFragment.this, DevicesListFragment.this);
 			}
 			else
 			{

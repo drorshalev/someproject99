@@ -7,7 +7,11 @@ import com.ibus.autowol.ui.OnPingProgressListener;
 
 public interface IPinger 
 {
-	public void ping(List<Device> devices, OnPingCompleteListener completeListener, OnPingProgressListener progressListener);
-	//public void ping(Device device, OnPingCompleteListener completeListener, OnPingProgressListener progressListener);
-	public void cancel();
+	public void start(List<Device> devices);
+	public void stop();
+	public void addOnPingCompleteListener(OnPingCompleteListener listener);
+	public void addOnPingProgressListener(OnPingProgressListener listener);
+
+
+	
 }

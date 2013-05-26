@@ -102,7 +102,34 @@ public class HostListAdapter extends ArrayAdapter<Device>
 		
 	}
 	
+	
+	public void dissableView(Device device)
+	{
+		for(View v : _views)
+		{
+			Device dev = (Device)v.getTag();
+			if(dev.getMacAddress().equals(device.getMacAddress()))
+			{
+				TextView ip = (TextView) v.findViewById(R.id.host_list_item_ip_address);
+				TextView mac = (TextView) v.findViewById(R.id.host_list_item_mac_address);
+				TextView pcName = (TextView) v.findViewById(R.id.host_list_item_pc_name);
+				ImageView img = (ImageView) v.findViewById(R.id.host_list_item_device_image);
+				
+				img.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_pc_dissabled));
+				ip.setTextColor(getContext().getResources().getColor(R.color.dissabled_text));
+				mac.setTextColor(getContext().getResources().getColor(R.color.dissabled_text));
+				pcName.setTextColor(getContext().getResources().getColor(R.color.dissabled_text));
+			}
+		}
+		
+	}
+	
+	
 }
+
+
+
+
 
 
 

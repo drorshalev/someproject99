@@ -35,8 +35,6 @@ public class MainActivity extends SherlockFragmentActivity
         InitialiseActionBar();
         _scanStartListeners = new ArrayList<OnScanStartListener>();
         
-        PersistantPinger p = new PersistantPinger();
-        p.ping(null, null, null);
     }
    
     @Override

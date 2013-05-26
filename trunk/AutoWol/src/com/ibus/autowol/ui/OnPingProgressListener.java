@@ -1,9 +1,9 @@
 package com.ibus.autowol.ui;
 
-import com.ibus.autowol.backend.Device;
+import com.ibus.autowol.backend.PingResult;
 
 
 public interface OnPingProgressListener 
 {
-	public void onPingProgress (Device device, boolean success);
+	public void onPingProgress (PingResult result);
 }

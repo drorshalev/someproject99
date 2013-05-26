@@ -42,7 +42,7 @@ public class Factory
 	  
 	public static IPinger getPinger()
 	{
-		return new DevicePinger();
+		return new PersistantPinger();
 	}
 	  
 }
