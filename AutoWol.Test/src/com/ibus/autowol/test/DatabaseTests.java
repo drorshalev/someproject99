@@ -3,11 +3,11 @@ package com.ibus.autowol.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.test.AndroidTestCase;
+
 import com.ibus.autowol.backend.Database;
 import com.ibus.autowol.backend.Device;
 import com.ibus.autowol.backend.Router;
-
-import android.test.AndroidTestCase;
 
 public class DatabaseTests extends AndroidTestCase {
 
