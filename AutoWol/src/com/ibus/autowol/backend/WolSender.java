@@ -4,11 +4,12 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
-import com.ibus.autowol.ui.OnWolSendCompleteListener;
-import com.ibus.autowol.ui.OnWolSendProgressListener;
 
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.ibus.autowol.ui.OnWolSendCompleteListener;
+import com.ibus.autowol.ui.OnWolSendProgressListener;
 
 public class WolSender extends AsyncTask<Device, Device, Void>  
 {

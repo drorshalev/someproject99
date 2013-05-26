@@ -13,7 +13,6 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.ibus.autowol.backend.PersistantPinger;
 import com.ibus.autowol.ui.ActivityListItem;
 import com.ibus.autowol.ui.DevicesListFragment;
 import com.ibus.autowol.ui.NavigationSpinnerAdapter;
