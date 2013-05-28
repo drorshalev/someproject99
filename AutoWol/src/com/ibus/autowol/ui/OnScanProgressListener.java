@@ -1,8 +1,8 @@
 package com.ibus.autowol.ui;
 
-import com.ibus.autowol.backend.Device;
+import com.ibus.autowol.backend.ThreadResult;
 
 public interface OnScanProgressListener 
 {
-	public void onScanProgress (Device host, int progress);
+	public void onScanProgress (ThreadResult thread);
 }

@@ -1,148 +1,100 @@
 package com.ibus.autowol.backend;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
+import com.ibus.autowol.backend.PersistantPinger.MessageHandler;
+import com.ibus.autowol.ui.OnPingCompleteListener;
+import com.ibus.autowol.ui.OnPingProgressListener;
 import com.ibus.autowol.ui.OnScanCompleteListener;
 import com.ibus.autowol.ui.OnScanProgressListener;
 
 public class NetworkScanner implements IHostEnumerator
 {
 	private final String TAG = "AutoWol-NetworkScanner";
-	public class Result
-	{
-		public Result(Device device, int progress)
-		{
-			this.device = device;
-			this.progress = progress;
-		}
-		public Device device;
-		public int progress;
-	}
-
-	public class Scan extends AsyncTask<Void, Result, Boolean>
-	{
-		List<OnScanProgressListener> _scanProgressListeners;
-		List<OnScanCompleteListener> _scanCompleteListeners; 
-		private INetwork _network;
+	private final MessageHandler _messageHandler = new MessageHandler();
+	private Thread _scannerThread;
+	private boolean _continue;
+	//private List<Device> _devices = new ArrayList<Device>();
+	private static int UPDATE_PROGRESS = 1;
+	private static int UPDATE_COMPLETE = 2;
 	
-		public void setNetwork(INetwork network) {
-			_network = network;
-		}
-		
-		public Scan()
-		{
-			_scanProgressListeners = new ArrayList<OnScanProgressListener>();
-			_scanCompleteListeners = new ArrayList<OnScanCompleteListener>(); 
-		}
+	
+	//handler used by the thread below to marshel messages back to the main ui thread. it is probably not neccessary 
+	//to declare this class static since it is not within scope of the activity so it shouldnt leak the activity?
+	//weak references ensure that our progress listeners can get garbage collected and dont leak
+	private static class MessageHandler extends Handler 
+	{
+		private final String TAG = "AutoWol-NetworkScanner";
+		private WeakReference<OnScanProgressListener> _progressListenerReference;
+		private WeakReference<OnScanCompleteListener> _completeListenerReference;
 		
 		@Override
-		public Boolean doInBackground(Void... params) 
+		public void handleMessage(Message msg) 
 		{
-			Log.i(TAG, "starting network scan with ip start: " + _network.getNetworkStartIp() + ". ip end:" + _network.getNetworkEndIp());
+			Log.i(TAG, "Entering handleMessage");	
 			
-			Long start = IpAddress.getUnsignedLongFromString(_network.getNetworkStartIp());
-			Long end = IpAddress.getUnsignedLongFromString(_network.getNetworkEndIp());
-			List<Device> hosts = null;
-			
-			int ii = 0;
-			for (long i = start; i <= end; i++) 
-			{	
-				Udp.probe(IpAddress.getStringFromLongUnsigned(i));
-				  
-				publishProgress(new Result(null, ii++));
-				
-				try 
+			if(msg.what == UPDATE_PROGRESS)
+			{
+				OnScanProgressListener l = _progressListenerReference.get();
+				if (l != null) 
 				{
-					Thread.sleep(10);
-				} catch (InterruptedException e) 
-				{
-					e.printStackTrace();
+					Log.i(TAG, "progress listener found");
+					ThreadResult res = (ThreadResult)msg.obj;
+					l.onScanProgress(res);
 				}
-				
-				if(isCancelled())
-					return false;
-		    }
-			
-			Log.i(TAG, "successfully completed probing devices on network");
-			
-			hosts = Arp.EnumerateHosts();
-			for(Device h : hosts)
-			{
-				String n = InetAddressManager.GetHostName(h.getIpAddress());
-				if(n == null || n == h.getIpAddress())
-					n = Jcifs.getHostName(h.getIpAddress());
-				h.setName(n);
-			
-				publishProgress(new Result(h, 254));
-				
-				if(isCancelled())
-					return false;
+				else
+				{
+					//the view that this handler updates no longer exists
+					Log.i(TAG, "progress listener is null / not found");
+				}
 			}
-			
-			Log.i(TAG, "successfully completed search for devices in arp cache");
-		
-		    return true;
-		}	
-		
-		
-		@Override
-		public void onProgressUpdate (Result... result)
-		{
-			for (OnScanProgressListener listener : _scanProgressListeners) 
+			else
 			{
-				listener.onScanProgress(result[0].device, result[0].progress );
-	        }
+				OnScanCompleteListener l = _completeListenerReference.get();
+				if (l != null) 
+				{
+					Log.i(TAG, "progress listener found");
+					l.onScanComplete();
+				}
+				else
+				{
+					//the view that this handler updates no longer exists
+					Log.i(TAG, "progress listener is null / not found");
+				}
+			}
 		}
 		
-		@Override
-		public void onPostExecute (Boolean result)
-		{
-			Log.i(TAG, "Network scan complete");
-			
-			for (OnScanCompleteListener listener : _scanCompleteListeners) 
-			{
-				listener.onScanComplete();
-	        }
-		}
-		
-		public void addHostSearchProgressListener(OnScanProgressListener listener) {
-			_scanProgressListeners.add(listener);
+		public void addOnScanProgressListener(OnScanProgressListener listener) {
+			_progressListenerReference = new WeakReference<OnScanProgressListener>(listener);
 	    }
 		
-		public void addHostSearchCompleteListener(OnScanCompleteListener listener) {
-			_scanCompleteListeners.add(listener);
+		public void addOnScanCompleteListener(OnScanCompleteListener listener) {
+			_completeListenerReference = new WeakReference<OnScanCompleteListener>(listener);
 	    }
 	}
 	
-	Scan currentScan = new Scan();
 	
-	@Override
-	public void scan(INetwork network, OnScanProgressListener progressListener, OnScanCompleteListener completeListener)
-	{
-		if(currentScan.getStatus() == AsyncTask.Status.RUNNING){
-			Log.i(TAG, "Network scan failed: scan thread already running");
-			return;
-		}
-		currentScan = new Scan();
-		currentScan.setNetwork(network);
-		currentScan.addHostSearchProgressListener(progressListener);
-		currentScan.addHostSearchCompleteListener(completeListener);
-		currentScan.execute();
-	}
 
 	@Override
-	public void cancel() 
-	{
-		if(currentScan.getStatus() == AsyncTask.Status.RUNNING)
-			currentScan.cancel(true);
+	public void scan(INetwork network, OnScanProgressListener progressListener,
+			OnScanCompleteListener completeListener) {
+
 		
-		Log.i(TAG, "Network scan canceled");
 	}
 
+	@Override
+	public void cancel() {
+
+		
+	}
+	
 	
 }
 

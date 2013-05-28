@@ -1,8 +1,8 @@
 package com.ibus.autowol.backend;
 
-public class PingResult 
+public class ThreadResult 
 {
-	public PingResult(Device device, boolean success)
+	public ThreadResult(Device device, boolean success)
 	{
 		this.device = device;
 		this.success = success;

@@ -29,7 +29,7 @@ import com.ibus.autowol.backend.HostListAdapter;
 import com.ibus.autowol.backend.IHostEnumerator;
 import com.ibus.autowol.backend.INetwork;
 import com.ibus.autowol.backend.IPinger;
-import com.ibus.autowol.backend.PingResult;
+import com.ibus.autowol.backend.ThreadResult;
 import com.ibus.autowol.backend.Router;
 import com.ibus.autowol.backend.WolSender;
 
@@ -144,7 +144,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 	}
 
 	@Override
-	public void onPingProgress(PingResult result) 
+	public void onPingProgress(ThreadResult result) 
 	{
 		Log.i(TAG, "Ping progress called");
 		
