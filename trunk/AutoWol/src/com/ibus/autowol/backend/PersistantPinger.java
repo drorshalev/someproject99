@@ -42,7 +42,7 @@ public class PersistantPinger implements Runnable, IPinger
 				if (l != null) 
 				{
 					Log.i(TAG, "progress listener found");
-					PingResult res = (PingResult)msg.obj;
+					ThreadResult res = (ThreadResult)msg.obj;
 					l.onPingProgress(res);
 				}
 				else
@@ -95,7 +95,7 @@ public class PersistantPinger implements Runnable, IPinger
 					s = InetAddressManager.ping(d.getIpAddress());
 				}
 				
-				Message msg = _messageHandler.obtainMessage(1, new PingResult(d, s));
+				Message msg = _messageHandler.obtainMessage(1, new ThreadResult(d, s));
 				_messageHandler.sendMessage(msg);	
 			}
 			

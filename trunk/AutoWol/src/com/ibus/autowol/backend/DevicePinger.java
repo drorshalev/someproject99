@@ -15,7 +15,7 @@ public class DevicePinger implements IPinger
 
 	
 	
-	public class Pinger extends AsyncTask<Device, PingResult, Boolean>
+	public class Pinger extends AsyncTask<Device, ThreadResult, Boolean>
 	{
 		List<OnPingCompleteListener> _pingCompleteListeners;
 		List<OnPingProgressListener> _pingProgressListeners;
@@ -32,7 +32,7 @@ public class DevicePinger implements IPinger
 			for(Device d : params)
 			{
 				boolean s = Shell.ping(d.getIpAddress());
-				publishProgress(new PingResult(d, s));
+				publishProgress(new ThreadResult(d, s));
 				
 				if(isCancelled())
 					return false;
@@ -42,7 +42,7 @@ public class DevicePinger implements IPinger
 		}	
 		
 		@Override
-		public void onProgressUpdate (PingResult... result)
+		public void onProgressUpdate (ThreadResult... result)
 		{
 			Log.i(TAG, "Ping complete");
 			
