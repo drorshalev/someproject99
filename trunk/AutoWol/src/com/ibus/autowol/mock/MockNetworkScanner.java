@@ -6,6 +6,7 @@ import java.util.List;
 import com.ibus.autowol.backend.Device;
 import com.ibus.autowol.backend.IHostEnumerator;
 import com.ibus.autowol.backend.INetwork;
+import com.ibus.autowol.backend.ThreadResult;
 import com.ibus.autowol.ui.OnScanCompleteListener;
 import com.ibus.autowol.ui.OnScanProgressListener;
 
@@ -16,11 +17,8 @@ public class MockNetworkScanner implements IHostEnumerator
 	List<OnScanCompleteListener> _scanCompleteListeners = new ArrayList<OnScanCompleteListener>();
 	
 	@Override
-	public void scan(INetwork network, OnScanProgressListener progressListener, OnScanCompleteListener completeListener) 
+	public void start(INetwork network) 
 	{
-		_scanProgressListeners.add(progressListener);
-		_scanCompleteListeners.add(completeListener);
-		
 		Device h1 = new Device();
 		h1.setNicVendor("nic vendor 1");
 		h1.setName("Host Name 1");
@@ -42,16 +40,30 @@ public class MockNetworkScanner implements IHostEnumerator
 		h3.setIpAddress("10.0.0.103");
 		h3.setDisplayName("Host Name 3");
 		
-		_scanProgressListeners.get(0).onScanProgress(h1, 1);
-		_scanProgressListeners.get(0).onScanProgress(h2, 100);
-		_scanProgressListeners.get(0).onScanProgress(h3, 254);
+		_scanProgressListeners.get(0).onScanProgress(new ThreadResult(h1));
+		_scanProgressListeners.get(0).onScanProgress(new ThreadResult(h2));
+		_scanProgressListeners.get(0).onScanProgress(new ThreadResult(h3));
 		
 		_scanCompleteListeners.get(0).onScanComplete();
 	}
 
+
+
 	@Override
-	public void cancel() {
+	public void stop() {
 		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addOnScanProgressListener(OnScanProgressListener listener) {
+		_scanProgressListeners.add(listener);
+		
+	}
+
+	@Override
+	public void addOnScanCompleteListener(OnScanCompleteListener listener) {
+		_scanCompleteListeners.add(listener);
 		
 	}
 

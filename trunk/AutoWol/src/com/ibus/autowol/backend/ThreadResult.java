@@ -7,6 +7,11 @@ public class ThreadResult
 		this.device = device;
 		this.success = success;
 	}
+	public ThreadResult(Device device)
+	{
+		this.device = device;
+	}
+	
 	public Device device;
 	public boolean success;
 }
