@@ -19,7 +19,7 @@ public class PersistantPinger implements Runnable, IPinger
 	private boolean _continue;
 	private List<Device> _devices = new ArrayList<Device>();
 	private static int UPDATE_PROGRESS = 1;
-	private static int UPDATE_COMPLETE = 2;
+	//private static int UPDATE_COMPLETE = 2;
 	
 	
 	//handler used by the thread below to marshel messages back to the main ui thread. it is probably not neccessary 
@@ -95,7 +95,7 @@ public class PersistantPinger implements Runnable, IPinger
 					s = InetAddressManager.ping(d.getIpAddress());
 				}
 				
-				Message msg = _messageHandler.obtainMessage(1, new ThreadResult(d, s));
+				Message msg = _messageHandler.obtainMessage(UPDATE_PROGRESS, new ThreadResult(d, s));
 				_messageHandler.sendMessage(msg);	
 			}
 			
@@ -117,10 +117,13 @@ public class PersistantPinger implements Runnable, IPinger
 	@Override
 	public void start(List<Device> devices) 
 	{
-		setContinue(true);
-		setDevices(devices);
-		_pingThread = new Thread(this);
-		_pingThread.start();
+		if(_pingThread == null || !_pingThread.isAlive())
+		{
+			setContinue(true);
+			setDevices(devices);
+			_pingThread = new Thread(this);
+			_pingThread.start();
+		}
 	}
 
 	

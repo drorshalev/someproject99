@@ -80,7 +80,7 @@ public class HostListAdapter extends ArrayAdapter<Device>
 		return null;
 	}
 	
-	public void enableView(Device device)
+	public void showDeviceAsAlive(Device device)
 	{
 		for(View v : _views)
 		{
@@ -102,7 +102,7 @@ public class HostListAdapter extends ArrayAdapter<Device>
 	}
 	
 	
-	public void dissableView(Device device)
+	public void showDeviceAsDown(Device device)
 	{
 		for(View v : _views)
 		{

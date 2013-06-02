@@ -33,7 +33,8 @@ import com.ibus.autowol.backend.ThreadResult;
 import com.ibus.autowol.backend.Router;
 import com.ibus.autowol.backend.WolSender;
 
-public class DevicesListFragment extends SherlockFragment implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, OnPingProgressListener, OnPingCompleteListener
+public class DevicesListFragment extends SherlockFragment 
+implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, OnPingProgressListener, OnPingCompleteListener
 {
 	ProgressDialog _progressDialog;
 	INetwork _network;
@@ -45,6 +46,8 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 	{
 		_network = Factory.getNetwork();
 		_hostEnumerator = Factory.getHostEnumerator();
+		_hostEnumerator.addOnScanProgressListener(this);
+		_hostEnumerator.addOnScanCompleteListener(this);
 	}
 	
 	@Override
@@ -158,11 +161,11 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		HostListAdapter adapter = (HostListAdapter)listView.getAdapter();
 		if(result.success)
 		{
-			adapter.enableView(result.device);
+			adapter.showDeviceAsAlive(result.device);
 		}
 		else
 		{
-			adapter.dissableView(result.device);
+			adapter.showDeviceAsDown(result.device);
 		}
 	}
 	
@@ -172,7 +175,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 	public void onDestroy()
 	{
 		super.onDestroy();
-		_hostEnumerator.cancel();
+		_hostEnumerator.stop();
 	}
 	
 	
@@ -189,7 +192,6 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 	public void onAttach (Activity activity)
 	{
 		super.onAttach(activity);
-		Activity ac = activity;
 	}
 	
 	@Override
@@ -223,6 +225,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 			
 			database.close();
 		
+			//the NetorkSelectedListener should already have completed by now???
 			ScanNetwork();
 		}
 		else
@@ -231,25 +234,25 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		}
 	}
 	
-	
-	
 	@Override
-	public void onScanProgress(Device host, int progress) 
+	public void onScanProgress(ThreadResult thread) 
 	{
-		if(host != null)
+		if(thread.device != null)
 		{
 			ListView listView = (ListView) getActivity().findViewById(R.id.host_list);
 			HostListAdapter adapter = (HostListAdapter)listView.getAdapter();
 			
-			Device d = adapter.GetDeviceForMac(host.getMacAddress());
+			Device d = adapter.GetDeviceForMac(thread.device.getMacAddress());
 			if(d != null)
-				d.copyFromScannedDevice(host);
+				d.copyFromScannedDevice(thread.device);
 			else
-				adapter.add(host);
+				adapter.add(thread.device);
 			
 			adapter.notifyDataSetChanged();
 		}
+		
 	}
+	
 	
 	@Override
 	public void onScanComplete() 
@@ -291,7 +294,7 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		_progressDialog.setIndeterminate(true);
 		_progressDialog.show();
 		
-		_hostEnumerator.scan(_network, this, this);
+		_hostEnumerator.start(_network);
 	}
 	
 	
@@ -410,6 +413,8 @@ public class DevicesListFragment extends SherlockFragment implements OnScanProgr
 		}
 	
 	}
+
+	
 
 	
 	
