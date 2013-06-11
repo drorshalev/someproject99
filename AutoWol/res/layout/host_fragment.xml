@@ -6,47 +6,34 @@
     android:background="@color/awol_white">
     
     
-   <!--  <LinearLayout 
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical" 
-         android:background="@color/awol_white"> -->
-    
-    	<Spinner
-         android:id="@+id/host_fragment_networks"
-         android:layout_width="fill_parent"
-         android:layout_height="50dp"
-         android:layout_marginLeft="5dp"
-         android:layout_marginRight="5dp"
-         android:layout_marginTop="5dp"/>
-    <!-- </LinearLayout> -->
-    
-
-    <!-- <LinearLayout 
-	android:id="@+id/host_fragment_progress_bar_placeholder"
-    android:layout_width="match_parent"
-    android:layout_height="5dp"
-    android:orientation="vertical" ></LinearLayout> -->
-    
-    <!-- <ProgressBar style="@android:style/Widget.ProgressBar.Horizontal"
-        android:max="255"
-        android:progress="0"
-        android:id="@+id/host_fragment_progress_bar"
-        android:layout_width="match_parent"
-        android:layout_height="5dp"
+   	<Spinner
+        android:id="@+id/host_fragment_networks"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
         android:layout_marginLeft="5dp"
-         android:layout_marginRight="5dp"
-        android:visibility="gone"/> -->
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"/>
+
+   	
+   	<com.ibus.autowol.ui.DeviceListView 
+   	    android:id="@+id/host_list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp">
+   	</com.ibus.autowol.ui.DeviceListView>
+   	
+   	
     
-    
-     <ListView
+     <!-- <ListView
         android:id="@+id/host_list"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
          android:layout_marginRight="5dp"
          android:layout_marginTop="5dp">
-    </ListView>
+    </ListView> -->
 
      
 
