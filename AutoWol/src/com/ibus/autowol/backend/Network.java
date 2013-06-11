@@ -24,46 +24,70 @@ public class Network implements INetwork
 {
     //private SharedPreferences prefs;
     private final String TAG = "Network";
+    private Context _context;
     
-    private String _networkStartIp;
-    private String _networkEndIp;
-    private String _netmaskIp;
-    private Device _device;
-    private Cidr _cidr;    
-    private String _carrier;
-    private WifiInfo wifiInfo;
-    private Router router;
+    public Network(Context context)
+   	{
+   		_context = context;
+   	}
     
-    public Router getRouter() {
-		return router;
-	}
-	public String getNetmaskIp() {
-		return _netmaskIp;
-	}
-	public String getNetworkEndIp() {
-		return _networkEndIp;
-	}
-	public String getNetworkStartIp() {
-		return _networkStartIp;
-	}
-	
-	public Network()
+	public Router getRouter() 
 	{
+		/*
+		 * Note: router.setIpAddress(IpAddress.getStringFromIntSigned(wifiInfo.
+		 * getIpAddress())); and router.setMacAddress(wifiInfo.getMacAddress());
+		 * are the ip and mac of the local devices wireless adapter (i.e the
+		 * phone)
+		 */
+		WifiManager wifiManager = (WifiManager) _context.getSystemService(Context.WIFI_SERVICE);
+		
+		if (wifiManager != null) 
+		{
+			WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+			String gatewayIp = IpAddress.getStringFromIntSigned(wifiManager
+					.getDhcpInfo().gateway);
+
+			Router router = new Router();
+			router.setBssid(wifiInfo.getBSSID());
+			router.setSsid(wifiInfo.getSSID());
+			router.setIpAddress(gatewayIp);
+
+			return router;
+		}
+
+		throw new RuntimeException("Could not get router. could not retrieve the system service: WIFI_SERVICE");
 	}
 	
-	public void refresh(Context context)
-    {
-    	setDevice();
-    	setWifiInfo(context);
-    	setHostBounds();
-    }
+	public String getNetmaskIp() 
+	{
+		WifiManager wifiManager = (WifiManager) _context.getSystemService(Context.WIFI_SERVICE);
+		if (wifiManager != null) 
+		{	
+			String _netmaskIp = IpAddress.getStringFromIntSigned(wifiManager.getDhcpInfo().netmask);
+			return _netmaskIp;
+		}
+		
+		throw new RuntimeException("Could not retrieve netmask. could not retrieve the system service: WIFI_SERVICE");
+	}
+	
+	
+	public String getNetworkEndIp() 
+	{
+		return GetNetworkBound(false);
+	}
+	
+	public String getNetworkStartIp() 
+	{
+		return GetNetworkBound(true);
+	}
+	
     
 	public boolean IsGateway(String ipAddress)
     {
     	if(ipAddress == null)
     		return false;
     	
-    	return ipAddress.equals(router.getIpAddress());
+    	return ipAddress.equals(getRouter().getIpAddress());
     }
     
     public boolean isMobileNetworkConnected(Context context) 
@@ -76,12 +100,16 @@ public class Network implements INetwork
         return isConnectedTo(context, ConnectivityManager.TYPE_WIFI);
     }
 	
-	
-	
+    
+   
+    
+    
+    
+    
     //set ip of the device to the first valid ip found a network interface
-    private void setDevice() 
+    private Device getDevice() 
     {
-    	_device = new Device();
+    	Device device = new Device();
         try 
         {
         	for (Enumeration<NetworkInterface> nics = NetworkInterface.getNetworkInterfaces(); nics.hasMoreElements();) 
@@ -91,75 +119,23 @@ public class Network implements INetwork
                 String ip = getInterfaceFirstIp(nic);
                 if (IpAddress.isValidIp(ip)) 
                 {
-                	_device.setName(nic.getName());
-                	_device.setIpAddress(ip);
-                	_device.setMacAddress(MacAddress.getStringFromBytes(nic.getHardwareAddress()));
-                    break;
+                	device.setName(nic.getName());
+                	device.setIpAddress(ip);
+                	device.setMacAddress(MacAddress.getStringFromBytes(nic.getHardwareAddress()));
+                    
+                	return device;
                 }
             }
             
-        } catch (SocketException e) {
+        } catch (SocketException e) 
+        {
             Log.e(TAG, e.getMessage());
         }
         
-    }
-    
-
-    private boolean setWifiInfo(Context context) 
-    {
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        if (wifiManager != null) 
-        {
-        	_netmaskIp = IpAddress.getStringFromIntSigned(wifiManager.getDhcpInfo().netmask);
-        	
-        	wifiInfo = wifiManager.getConnectionInfo();
-        	String gatewayIp = IpAddress.getStringFromIntSigned(wifiManager.getDhcpInfo().gateway);
-        	router = new Router();
-        	router.setBssid(wifiInfo.getBSSID());
-        	router.setSsid(wifiInfo.getSSID());
-        	router.setIpAddress(gatewayIp);
-        	
-        	/*
-        	 * Note: 
-        	 * 
-        	 * router.setIpAddress(IpAddress.getStringFromIntSigned(wifiInfo.getIpAddress()));
-        	 * and 
-        	 * router.setMacAddress(wifiInfo.getMacAddress());
-        	 * 
-        	 * are the ip and mac of the local devices wireless adapter (i.e the phone)
-        	 *  
-        	*/
-        	
-            return true;
-        }
-        return false;
+        throw new RuntimeException("Could not get router. could not retrieve the system service: WIFI_SERVICE");
     }
     
     
-    private void setHostBounds()
-    {
-    	_cidr = new Cidr(_netmaskIp);
-    	
-    	long numericDeviceIp = IpAddress.getUnsignedLongFromString(_device.getIpAddress()); 
-    	
-    	// Detected IP
-        int shift = (32 - _cidr.getCidr());
-        long start;
-        long end;
-        if (_cidr.getCidr() < 31) {
-        	start =  (numericDeviceIp >> shift << shift) + 1;
-        	end =  (start | ((1 << shift) - 1)) - 1;
-        } 
-        else 
-        {
-        	start =  (numericDeviceIp >> shift << shift);
-        	end =  (start | ((1 << shift) - 1));
-        }
-        
-        _networkStartIp = IpAddress.getStringFromLongUnsigned(start);
-    	_networkEndIp = IpAddress.getStringFromLongUnsigned(end);
-    }
-
     private String getInterfaceFirstIp(NetworkInterface ni) 
     {
         if (ni != null) 
@@ -182,9 +158,6 @@ public class Network implements INetwork
         
         return null;
     }
-
-
-    
     
     
     private boolean isConnectedTo(Context context, int connectionType) 
@@ -193,6 +166,114 @@ public class Network implements INetwork
         NetworkInfo con = connManager.getNetworkInfo(connectionType);
         return con.isConnected();
     }
+
+	private String GetNetworkBound(boolean getStart)
+	{
+		Cidr _cidr = new Cidr(getNetmaskIp());
+		Device device = getDevice();
+    	
+    	long numericDeviceIp = IpAddress.getUnsignedLongFromString(device.getIpAddress()); 
+    	
+    	// Detected IP
+        int shift = (32 - _cidr.getCidr());
+        long start;
+        long end;
+        
+        if (_cidr.getCidr() < 31) {
+        	start =  (numericDeviceIp >> shift << shift) + 1;
+        	end =  (start | ((1 << shift) - 1)) - 1;
+        } 
+        else 
+        {
+        	start =  (numericDeviceIp >> shift << shift);
+        	end =  (start | ((1 << shift) - 1));
+        }
+        
+        if(getStart)
+        	return IpAddress.getStringFromLongUnsigned(start);
+        else
+        	return IpAddress.getStringFromLongUnsigned(end);	
+	}
+	
+	
+}
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+  /*  private boolean setWifiInfo(Context context) 
+    {
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        if (wifiManager != null) 
+        {
+        	_netmaskIp = IpAddress.getStringFromIntSigned(wifiManager.getDhcpInfo().netmask);
+        	
+        	wifiInfo = wifiManager.getConnectionInfo();
+        	String gatewayIp = IpAddress.getStringFromIntSigned(wifiManager.getDhcpInfo().gateway);
+        	router = new Router();
+        	router.setBssid(wifiInfo.getBSSID());
+        	router.setSsid(wifiInfo.getSSID());
+        	router.setIpAddress(gatewayIp);
+        	
+        	
+        	 * Note: 
+        	 * 
+        	 * router.setIpAddress(IpAddress.getStringFromIntSigned(wifiInfo.getIpAddress()));
+        	 * and 
+        	 * router.setMacAddress(wifiInfo.getMacAddress());
+        	 * 
+        	 * are the ip and mac of the local devices wireless adapter (i.e the phone)
+        	 *  
+        	
+        	
+            return true;
+        }
+        return false;
+    }
+    */
+    
+  /*  private void setHostBounds()
+    {
+    	_cidr = new Cidr(_netmaskIp);
+    	
+    	long numericDeviceIp = IpAddress.getUnsignedLongFromString(_device.getIpAddress()); 
+    	
+    	// Detected IP
+        int shift = (32 - _cidr.getCidr());
+        long start;
+        long end;
+        if (_cidr.getCidr() < 31) {
+        	start =  (numericDeviceIp >> shift << shift) + 1;
+        	end =  (start | ((1 << shift) - 1)) - 1;
+        } 
+        else 
+        {
+        	start =  (numericDeviceIp >> shift << shift);
+        	end =  (start | ((1 << shift) - 1));
+        }
+        
+        _networkStartIp = IpAddress.getStringFromLongUnsigned(start);
+    	_networkEndIp = IpAddress.getStringFromLongUnsigned(end);
+    }
+*/
+   
+
+
+    
+    
+    
+  
     
     
 
@@ -211,7 +292,7 @@ public class Network implements INetwork
     
 
 
-    public boolean getMobileInfo(Context context) {
+    /*public boolean getMobileInfo(Context context) {
         TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         if (tm != null) {
             _carrier = tm.getNetworkOperatorName();
@@ -225,7 +306,7 @@ public class Network implements INetwork
         int start = ((int) IpAddress.getUnsignedLongFromString(_device.getIpAddress()) >> shift << shift);
         return IpAddress.getStringFromLongUnsigned((long) start);
     }
-
+*/
 
     
     
@@ -323,7 +404,7 @@ public class Network implements INetwork
     // return null;
     // }
     // }
-}
+
 
 
 
