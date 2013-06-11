@@ -14,10 +14,16 @@ public class Device implements Serializable
 	protected String macAddress;	
 	protected String nicVendor;
 	private int routerId;
-	
+	private boolean isLive;
 	
 	// Properties //////////////////////////////////////////////////////////
 
+	public boolean isLive() {
+		return isLive;
+	}
+	public void setLive(boolean isLive) {
+		this.isLive = isLive;
+	}
 	public int getRouterId() {
 		return routerId;
 	}

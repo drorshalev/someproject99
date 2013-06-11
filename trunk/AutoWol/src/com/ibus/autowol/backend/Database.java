@@ -225,7 +225,14 @@ public class Database {
 		  return devices;
 	  }
 	  
-	  public ArrayList<Device> getDevicesForRouter(int routerId) 
+	  public List<Device> getDevicesForRouter(String routerBssid) 
+	  {
+		  Router r = getRouterForBssid(routerBssid);
+		  return getDevicesForRouter(r.primaryKey);
+	  }
+	  
+	  
+	  public List<Device> getDevicesForRouter(int routerId) 
 	  {
 		  ArrayList<Device> devices = new ArrayList<Device>();
 		  String[] params = {((Integer)routerId).toString()};

@@ -15,7 +15,6 @@ public interface INetwork
 	public String getNetworkEndIp();
 	public String getNetworkStartIp();
 	
-	public void refresh(Context ctxt);
     public boolean IsGateway(String ipAddress);
     
     public boolean isMobileNetworkConnected(Context ctxt); 
