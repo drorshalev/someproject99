@@ -133,18 +133,20 @@ public class MainActivity extends SherlockFragmentActivity
         startActivity(intent);
     }*/
     
-    
+    /*
 	 @Override        
-	 public void onSaveInstanceState(Bundle SavedInstanceState) {
+	 public void onSaveInstanceState(Bundle SavedInstanceState) 
+	 {
 		 super.onSaveInstanceState(SavedInstanceState);     
 		 Log.i(TAG, "Saving instance state");
-	 }
-	 
+	 }*/
+	
+	 /*
 	 @Override    
 	 public void onRestoreInstanceState(Bundle savedInstanceState) {
 		 super.onRestoreInstanceState(savedInstanceState);
 		 Log.i(TAG, "Restoring instance state");
-	 } 
+	 }*/ 
 	
     
 	
@@ -185,6 +187,8 @@ public class MainActivity extends SherlockFragmentActivity
 			if(_devicesListFragment == null)
 			{
 				_devicesListFragment = (DevicesListFragment)SherlockFragment.instantiate(MainActivity.this, DevicesListFragment.class.getName()); 
+				//_devicesListFragment.setRetainInstance(false);
+				
 				addScanStartListener(_devicesListFragment);
 			}
 			

@@ -36,13 +36,13 @@ public abstract class InetAddressManager
 	
 
 	/*this seems to work differently to the native ping available in a linux / windows console.  will fail on a windows host that has a a firewall up*/
-	public static boolean ping(String ip)
+	public static boolean ping(String ip, int timeOUt)
 	{
 		try 
 		{
 			InetAddress in = InetAddress.getByName(ip);
 			
-			 if (in.isReachable(1000)) 
+			 if (in.isReachable(timeOUt)) 
 			 {
 				 Log.i("HostEnumerator.Pinged", ip +  " was pinged successfully"); 
 				 return true;

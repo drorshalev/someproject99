@@ -3,6 +3,11 @@ package com.ibus.autowol.backend;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import android.os.Handler;
 import android.os.Message;
@@ -89,18 +94,16 @@ public class PersistantPinger implements Runnable, IPinger
 
 			for(Device d : dl)
 			{
-				boolean s = Shell.ping(d.getIpAddress());
+				boolean s = InetAddressManager.ping(d.getIpAddress(), 300);
 				if(!s)
-				{
-					s = InetAddressManager.ping(d.getIpAddress());
-				}
+					s = Shell.ping(d.getIpAddress());	
 				
 				Message msg = _messageHandler.obtainMessage(UPDATE_PROGRESS, new ThreadResult(d, s));
 				_messageHandler.sendMessage(msg);	
 			}
 			
 			try {
-				Thread.sleep(200);
+				Thread.sleep(3000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -112,6 +115,92 @@ public class PersistantPinger implements Runnable, IPinger
 		
 		Log.i(TAG, "exiting thread");
 	}	
+	
+	
+	
+	
+	/*@Override
+	public void run() 
+	{
+
+		Log.i(TAG, "PersistantPinger Thread entered ....");
+		
+
+		while (getContinue()) 
+		{
+			ExecutorService executor = Executors.newFixedThreadPool(5);
+			List<Future<ThreadResult>> list = new ArrayList<Future<ThreadResult>>();
+
+			List<Device> dl = getDevices();
+
+			for (Device d : dl) 
+			{
+				Callable<ThreadResult> worker = new HostEnumerationCallable(d);
+				Future<ThreadResult> submit = executor.submit(worker);
+				list.add(submit);
+			}
+
+			// Now retrieve the result
+			for (Future<ThreadResult> future : list) 
+			{
+				try 
+				{
+					ThreadResult res = future.get();
+					Log.i(TAG, "Completed pinging " + res.device.getIpAddress());
+					
+					Message msg = _messageHandler.obtainMessage(UPDATE_PROGRESS, res);
+					_messageHandler.sendMessage(msg);					
+					
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				}
+			}
+
+			executor.shutdown();
+
+			try 
+			{
+				Log.i(TAG, "PersistantPinger Thread is sleeping for 5 seconds");
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		Log.i(TAG, "exiting PersistantPinger thread");
+	}
+	*/
+	
+	/*public class HostEnumerationCallable implements Callable<ThreadResult> 
+	{
+		Device _device;
+		
+		public HostEnumerationCallable(Device device)
+		{
+			_device = device.getCopy();
+		}
+		
+		@Override
+		public ThreadResult call() throws Exception 
+		{
+			ThreadResult result = new ThreadResult(_device);
+			
+			result.success = InetAddressManager.ping(_device.getIpAddress(), 300);
+			if(!result.success)
+			{
+				result.success = Shell.ping(_device.getIpAddress());	
+			}
+			
+			return result;
+		}
+	
+	}*/
+	
+	
+	
 	
 	
 	@Override
