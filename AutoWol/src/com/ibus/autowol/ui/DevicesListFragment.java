@@ -118,7 +118,7 @@ implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, 
 			if(arg1 == null)
 				return;
 			
-			String routerBssid = (String)arg1.getTag();
+			String routerMac = (String)arg1.getTag();
 			
 			Database database = new Database(getActivity());
 			database.open();
@@ -126,8 +126,8 @@ implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, 
 			
 			//Router r = database.getRouterForBssid(routerBssid);
 			
-			List<Device> devices = database.getDevicesForRouter(routerBssid);
-			Log.i(TAG, String.format("%d devices found for router with bssid: %s", devices.size(), routerBssid));
+			List<Device> devices = database.getDevicesForRouterMac(routerMac);
+			Log.i(TAG, String.format("%d devices found for router with bssid: %s", devices.size(), routerMac));
 			
 			boolean isConnected =_network.isWifiNetworkConnected(getActivity());
 			if(isConnected)
@@ -136,27 +136,27 @@ implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, 
 				{
 					//if this is the current network and it has no devices or we have not scanned for devices yet then scan
 					//TODO: prompt user "you currently dont have any devices listed for the network, would you like to scan for devices now?"
-					if(routerBssid.equals(_network.getRouter().getBssid()))
+					if(routerMac.equals(_network.getRouter().getMacAddress()))
 						ScanNetwork();
 				}
 				else
 				{
 				
 					//We have selected the current network. restore last known live routers 
-					if(routerBssid.equals(_network.getRouter().getBssid()))
+					if(routerMac.equals(_network.getRouter().getMacAddress()))
 					{
-						_deviceListView.setRouterBssid(routerBssid);
+						_deviceListView.setRouterMac(routerMac);
 						_deviceListView.setDevices(devices, _savedLiveDevicesMac);
-						//_pinger.start(devices);
+						_pinger.start(devices);
 					}
 					else
 					{
 						//last selected network was the current network. get a list of devices known to be live so we can 
 						//quickly show live routers when we come back
-						if(_deviceListView.getRouterBssid().equals(_network.getRouter().getBssid()))
-							_savedLiveDevicesMac = _deviceListView.getLiveDevices();	
+						if(_deviceListView.getRouterMac().equals(_network.getRouter().getMacAddress()))
+							_savedLiveDevicesMac = _deviceListView.getLiveDevicesMac();	
 						
-						_deviceListView.setRouterBssid(routerBssid);
+						_deviceListView.setRouterMac(routerMac);
 						_deviceListView.setDevices(devices);
 						
 						/*TODO: we should be pausing the thread here not terminating*/
@@ -166,7 +166,7 @@ implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, 
 			}
 			else
 			{
-				_deviceListView.setRouterBssid(routerBssid);
+				_deviceListView.setRouterMac(routerMac);
 				_deviceListView.setDevices(devices);
 			}
 			
@@ -312,7 +312,7 @@ implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, 
 		Database database = new Database(getActivity());
 		database.open();
 		
-		Router r = database.getRouterForBssid(_network.getRouter().getBssid());
+		Router r = database.getRouterForMac(_network.getRouter().getMacAddress());
 		
 		//add or update all devices in our adapter to our db 
 		database.saveDevicesForRouter(_deviceListView.GetItems(), r.getPrimaryKey());
@@ -368,7 +368,7 @@ implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, 
 		Router r =  (Router)_netorkSpinner.getSelectedItem();
 		
 		//ping displayed devices if they belong to the network we are in
-		if(r.getBssid().equals(_network.getRouter().getBssid()))
+		if(r.getMacAddress().equals(_network.getRouter().getMacAddress()))
 		{
 	        _pinger.start(_deviceListView.GetItems());
 		}
@@ -398,7 +398,7 @@ implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, 
 	{ 
 		 NetworkSpinnerAdapter ntwkAdapter = (NetworkSpinnerAdapter)_netorkSpinner.getAdapter();
 		 
-		 int pos = ntwkAdapter.GetPositionForBssid(mac);
+		 int pos = ntwkAdapter.GetPositionForMac(mac);
 		 if(pos != -1)
 		 {
 			 _netorkSpinner.setSelection(pos);

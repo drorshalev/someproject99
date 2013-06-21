@@ -227,21 +227,13 @@ public class Database {
 		  return devices;
 	  }
 	  
-	  public List<Device> getDevicesForRouter(String routerBssid) 
+	  public List<Device> getDevicesForRouterMac(String routerMac) 
 	  {
-		  Router r = getRouterForBssid(routerBssid);
-		  return getDevicesForRouter(r.primaryKey);
+		  Router r = getRouterForMac(routerMac);
+		  return getDevicesForRouterId(r.primaryKey);
 	  }
-	  
-	  public List<Device> getDevicesForMac(String mac) 
-	  {
-		  Router r = getRouterForMac(mac);
-		  return getDevicesForRouter(r.primaryKey);
-	  }
-	  
-	  
-	  
-	  public List<Device> getDevicesForRouter(int routerId) 
+	 
+	  public List<Device> getDevicesForRouterId(int routerId) 
 	  {
 		  ArrayList<Device> devices = new ArrayList<Device>();
 		  String[] params = {((Integer)routerId).toString()};
@@ -288,8 +280,8 @@ public class Database {
 	  {
 		  ContentValues cv = getRouterContentValues(router);
 		  
-		  String[] params = {router.getMacAddress()};  
-		  return (int)db.update(TABLE_ROUTER, cv, COLUMN_ROUTER_MAC + "=?", params);
+		  String[] params = {((Integer)router.getPrimaryKey()).toString()};
+		  return (int)db.update(TABLE_ROUTER, cv, COLUMN_ROUTER_ID + "=?", params);
 	  }
 	  
 	  

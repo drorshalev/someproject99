@@ -20,14 +20,14 @@ public class DeviceListView extends ListView
 {
 	HostListAdapter _deviceListadapter;
 	private List<Device> _devices;
-	private String _routerBssid = "";
+	private String _routerMac = "";
 
-	public String getRouterBssid() {
-		return _routerBssid;
+	public String getRouterMac() {
+		return _routerMac;
 	}
 
-	public void setRouterBssid(String _routerBssid) {
-		this._routerBssid = _routerBssid;
+	public void setRouterMac(String _routerMac) {
+		this._routerMac = _routerMac;
 	}
 
 	public DeviceListView(Context context) {
@@ -81,7 +81,7 @@ public class DeviceListView extends ListView
 		}
 	}
 	
-	public List<String> getLiveDevices()
+	public List<String> getLiveDevicesMac()
 	{
 		List<String> dl = new ArrayList<String>();
 		
