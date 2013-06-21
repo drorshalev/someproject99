@@ -25,12 +25,6 @@ public class Router extends Device implements Serializable
 		this.bssid = bssid;
 	}
 	
-	//a string to uniquely identify this router
-	public String getId()
-	{
-		return getMacAddress();
-	}
-	
 	// Constructors //////////////////////////////////////////////////////////
 	
 	public Router(){
