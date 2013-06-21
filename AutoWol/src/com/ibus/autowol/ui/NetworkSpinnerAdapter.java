@@ -87,6 +87,7 @@ public class NetworkSpinnerAdapter extends BaseAdapter implements SpinnerAdapter
 		return -1;
 	}
 	
+
 	public void notifyDataSetChanged()
 	{
 		super.notifyDataSetChanged();

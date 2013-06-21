@@ -2,7 +2,6 @@ package com.ibus.autowol.ui;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -15,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.ActionMode;
@@ -53,6 +51,8 @@ implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, 
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
+		super.onCreateView(inflater, container, savedInstanceState); //????????????????????
+		
 		//need to create network here because our activity context has not yet been created
 		_network = Factory.getNetwork(getActivity());
 		
@@ -71,9 +71,9 @@ implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, 
 	@Override
     public void onActivityCreated(Bundle savedInstanceState) 
 	{
-		Log.i(TAG, "DevicesListFragment.onActivityCreated is executing");
-		
 		super.onActivityCreated(savedInstanceState);
+		
+		Log.i(TAG, "DevicesListFragment.onActivityCreated is executing");
 		
 		//create device list
 		_deviceListView = (DeviceListView) getActivity().findViewById(R.id.host_list);
@@ -122,6 +122,9 @@ implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, 
 			
 			Database database = new Database(getActivity());
 			database.open();
+			
+			
+			//Router r = database.getRouterForBssid(routerBssid);
 			
 			List<Device> devices = database.getDevicesForRouter(routerBssid);
 			Log.i(TAG, String.format("%d devices found for router with bssid: %s", devices.size(), routerBssid));
@@ -345,7 +348,7 @@ implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, 
 			
 			//Select the router of our current network. Note the NetorkSelectedListener will fire regardless of 
 			//whether we select anything 
-			selectRouter(router.getBssid());
+			selectRouter(router.getMacAddress());
 			
 			database.close();
 			return true;
@@ -391,11 +394,11 @@ implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, 
 	}
 
 
-	private void selectRouter(String bssid)
+	private void selectRouter(String mac)
 	{ 
 		 NetworkSpinnerAdapter ntwkAdapter = (NetworkSpinnerAdapter)_netorkSpinner.getAdapter();
 		 
-		 int pos = ntwkAdapter.GetPositionForBssid(bssid);
+		 int pos = ntwkAdapter.GetPositionForBssid(mac);
 		 if(pos != -1)
 		 {
 			 _netorkSpinner.setSelection(pos);

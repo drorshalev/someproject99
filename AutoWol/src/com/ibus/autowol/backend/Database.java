@@ -127,6 +127,8 @@ public class Database {
 	  private static final String SQL_GET_ROUTER_FOR_BSSID = 
 			  "select * from " + TABLE_ROUTER + " where " + COLUMN_ROUTER_BSSID + "=?";
 	  
+	  private static final String SQL_GET_ROUTER_FOR_MAC = 
+			  "select * from " + TABLE_ROUTER + " where " + COLUMN_ROUTER_MAC + "=?";
 	  
 	  private static final String SQL_GET_DEVICE = 
 			  "select * from " + TABLE_DEVICE + " where " + COLUMN_DEVICE_ID + "=?";
@@ -231,6 +233,13 @@ public class Database {
 		  return getDevicesForRouter(r.primaryKey);
 	  }
 	  
+	  public List<Device> getDevicesForMac(String mac) 
+	  {
+		  Router r = getRouterForMac(mac);
+		  return getDevicesForRouter(r.primaryKey);
+	  }
+	  
+	  
 	  
 	  public List<Device> getDevicesForRouter(int routerId) 
 	  {
@@ -258,7 +267,7 @@ public class Database {
 	  
 	  public int saveRouter(Router router)
 	  {
-		  Router r = getRouterForBssid(router.getBssid());
+		  Router r = getRouterForMac(router.getMacAddress());
 		  if(r == null)
 		  {
 			  return addRouter(router);
@@ -279,8 +288,8 @@ public class Database {
 	  {
 		  ContentValues cv = getRouterContentValues(router);
 		  
-		  String[] params = {router.getBssid()};  
-		  return (int)db.update(TABLE_ROUTER, cv, COLUMN_ROUTER_BSSID + "=?", params);
+		  String[] params = {router.getMacAddress()};  
+		  return (int)db.update(TABLE_ROUTER, cv, COLUMN_ROUTER_MAC + "=?", params);
 	  }
 	  
 	  
@@ -339,6 +348,20 @@ public class Database {
 		  
 		  return null;
 	  }
+	  
+	  
+	  public Router getRouterForMac(String mac) 
+	  {
+		  String[] params = {mac};
+		  Cursor cursor = db.rawQuery(SQL_GET_ROUTER_FOR_MAC, params);
+		  
+		  if(cursor.moveToFirst())
+			  return cursorRowToRouter(cursor);
+		  
+		  return null;
+	  }
+	  
+	  
 	  
 	  public int deleteDevicesForRouter(int routerId) 
 	  {

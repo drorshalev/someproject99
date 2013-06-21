@@ -51,6 +51,7 @@ public class Network implements INetwork
 			router.setBssid(wifiInfo.getBSSID());
 			router.setSsid(wifiInfo.getSSID());
 			router.setIpAddress(gatewayIp);
+			router.setMacAddress(wifiInfo.getMacAddress());
 
 			return router;
 		}
