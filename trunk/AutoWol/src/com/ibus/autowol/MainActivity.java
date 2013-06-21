@@ -17,6 +17,7 @@ import com.ibus.autowol.ui.ActivityListItem;
 import com.ibus.autowol.ui.DevicesListFragment;
 import com.ibus.autowol.ui.NavigationSpinnerAdapter;
 import com.ibus.autowol.ui.OnScanStartListener;
+import com.ibus.autowol.ui.SchedulesListFragment;
 
 public class MainActivity extends SherlockFragmentActivity 
 {	
@@ -40,23 +41,6 @@ public class MainActivity extends SherlockFragmentActivity
     public boolean onCreateOptionsMenu(Menu menu) 
     {
     	getSupportMenuInflater().inflate(R.menu.activity_main, menu);
-    	
-    	//MenuItem scan = (MenuItem)menu.findItem(R.id.activity_main_scan);
-    	
-    	//scan.setActionView(R.layout.progress_indicator);
-    	//scan.setActionView(null);
-    	
-    	//scan.collapseActionView();
-    	
-    	//scan.setActionView(null);
-    	
-    	//scan.expandActionView();
-    	
-    	//scan.collapseActionView();
-    	
-
-
-    	
         return true; 
     }
     
@@ -158,7 +142,8 @@ public class MainActivity extends SherlockFragmentActivity
 	public class ActionBarNavigationListener implements ActionBar.OnNavigationListener
 	{
 		DevicesListFragment _devicesListFragment;
-
+		SchedulesListFragment _schedulesListFragment;
+		
 		public ActionBarNavigationListener()
 		{
 		}
@@ -166,17 +151,30 @@ public class MainActivity extends SherlockFragmentActivity
 		@Override
 		public boolean onNavigationItemSelected(int position, long itemId) 
 		{
-			return DisplayDevicesFragment();
+			if(position == 0)
+				return displayDevicesFragment();
+			else
+				return displaySchedulesListFragment();
 		}
 		
 		
-		private boolean DisplayDevicesFragment()
+		private boolean displayDevicesFragment()
 		{
 			DevicesListFragment devicesListFragment = getDevicesListFragment();
 			
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.replace(android.R.id.content, devicesListFragment);
+			ft.commit();
 			
+			return true;  
+		}
+		
+		private boolean displaySchedulesListFragment()
+		{
+			SchedulesListFragment fragment = getSchedulesListFragment();
+			
+			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+			ft.replace(android.R.id.content, fragment);
 			ft.commit();
 			
 			return true;  
@@ -187,14 +185,24 @@ public class MainActivity extends SherlockFragmentActivity
 			if(_devicesListFragment == null)
 			{
 				_devicesListFragment = (DevicesListFragment)SherlockFragment.instantiate(MainActivity.this, DevicesListFragment.class.getName()); 
-				//_devicesListFragment.setRetainInstance(false);
-				
 				addScanStartListener(_devicesListFragment);
 			}
 			
 			return _devicesListFragment;
 		}
-			    
+		
+		
+		
+		public SchedulesListFragment getSchedulesListFragment()
+		{
+			if(_schedulesListFragment == null)
+			{
+				_schedulesListFragment = (SchedulesListFragment)SherlockFragment.instantiate(MainActivity.this, SchedulesListFragment.class.getName()); 
+			}
+			
+			return _schedulesListFragment;
+		}
+		
 	}
 	
 	
