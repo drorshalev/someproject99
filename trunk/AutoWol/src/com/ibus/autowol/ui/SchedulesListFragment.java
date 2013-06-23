@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.ibus.autowol.R;
 
-public class SchedulesListFragment extends SherlockFragment
+public class SchedulesListFragment extends SherlockFragment 
 {
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
@@ -22,12 +22,32 @@ public class SchedulesListFragment extends SherlockFragment
 		super.onCreateView(inflater, container, savedInstanceState);
 		
 		View v = inflater.inflate(R.layout.schedules_list_fragment, container, false);
+		
         return v;
 	}
+	
 	
 	@Override
     public void onActivityCreated(Bundle savedInstanceState) 
 	{
 		super.onActivityCreated(savedInstanceState);
 	}
+	
+	
+	@Override
+	public void onResume() 
+	{
+		//fragment is visible here
+		super.onResume();
+		
+	}
+	
+	
+	public void addSchedule(String scheduleId)
+	{
+	 
+	}
+
+	
+	
 }

@@ -44,9 +44,8 @@ public class Network implements INetwork
 		if (wifiManager != null) 
 		{
 			WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-			String gatewayIp = IpAddress.getStringFromIntSigned(wifiManager
-					.getDhcpInfo().gateway);
-
+			String gatewayIp = IpAddress.getStringFromIntSigned(wifiManager.getDhcpInfo().gateway);
+			
 			Router router = new Router();
 			router.setBssid(wifiInfo.getBSSID());
 			router.setSsid(wifiInfo.getSSID());

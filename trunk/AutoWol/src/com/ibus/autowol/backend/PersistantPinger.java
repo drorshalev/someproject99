@@ -211,6 +211,7 @@ public class PersistantPinger implements Runnable, IPinger
 			setContinue(true);
 			setDevices(devices);
 			_pingThread = new Thread(this);
+			_pingThread.setDaemon(true);
 			_pingThread.start();
 		}
 	}

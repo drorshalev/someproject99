@@ -6,14 +6,14 @@ import java.util.List;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.ibus.autowol.ui.ActivityListItem;
+import com.ibus.autowol.ui.AddDeviceActivity;
+import com.ibus.autowol.ui.AddScheduleActivity;
 import com.ibus.autowol.ui.DevicesListFragment;
 import com.ibus.autowol.ui.NavigationSpinnerAdapter;
 import com.ibus.autowol.ui.OnScanStartListener;
@@ -21,9 +21,12 @@ import com.ibus.autowol.ui.SchedulesListFragment;
 
 public class MainActivity extends SherlockFragmentActivity 
 {	
+	private static final int AddScheduleActivityRequest = 1;
+    private static final int AddDeviceActivityRequest = 2;
 	private static final String TAG = "MainActivity";
 	private ActionBarNavigationListener _actionBarNavigationListener;
 	List<OnScanStartListener> _scanStartListeners; 
+	private int _optionsMenu;
 	
 
     @Override
@@ -32,6 +35,8 @@ public class MainActivity extends SherlockFragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        _optionsMenu = R.menu.devices_list_fragment_menu;
+        
         InitialiseActionBar();
         _scanStartListeners = new ArrayList<OnScanStartListener>();
         
@@ -40,7 +45,7 @@ public class MainActivity extends SherlockFragmentActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) 
     {
-    	getSupportMenuInflater().inflate(R.menu.activity_main, menu);
+    	getSupportMenuInflater().inflate(_optionsMenu, menu);    	
         return true; 
     }
     
@@ -48,17 +53,24 @@ public class MainActivity extends SherlockFragmentActivity
     public boolean onOptionsItemSelected(MenuItem item) 
     {
         switch (item.getItemId()) 
-        {
-            /*case R.id.add_host:
-            	GoToNetworkScanActivity(); */ 
-            case R.id.activity_main_scan:
-            	startScan();   	
+        { 
+            case R.id.devices_list_fragment_scan:
+            	startScan();  
+            	break;
+            case R.id.devices_list_fragment_add:
+            	GoToAddDeviceActivity();  
+            	break;
+            case R.id.schedules_list_fragment_add:
+            	GoToAddScheduleActivity();
+            	break;
         }
         
         return true;
     }    
    
-    private void startScan()
+    
+
+	private void startScan()
     {
     	for (OnScanStartListener listener : _scanStartListeners) 
 		{
@@ -89,10 +101,8 @@ public class MainActivity extends SherlockFragmentActivity
 	    intent.getStringExtra("DATA");
 	}
 	
-	
-	
 	public void addScanStartListener(OnScanStartListener listener) {
-    	_scanStartListeners.add(listener);
+    	_scanStartListeners.add(listener); 
     }
     
     private void InitialiseActionBar()
@@ -110,13 +120,54 @@ public class MainActivity extends SherlockFragmentActivity
         actionBar.setListNavigationCallbacks(new NavigationSpinnerAdapter(ar, this), _actionBarNavigationListener);
     }
     
-   /* public void GoToNetworkScanActivity()
-    {
-    	Intent intent = new Intent(this, NetworkScanActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-    }*/
     
+    public void GoToAddScheduleActivity()
+    {
+    	/*Intent intent = new Intent(this, AddScheduleActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);*/
+    	
+    	//Intent.FLAG_ACTIVITY_CLEAR_TOP
+    	
+        Intent myIntent = new Intent();
+        myIntent.setClass(MainActivity.this,AddScheduleActivity.class);
+        startActivityForResult(myIntent,AddScheduleActivityRequest);
+    }
+    
+    private void GoToAddDeviceActivity() 
+    {
+		Intent myIntent = new Intent();
+        myIntent.setClass(MainActivity.this,AddDeviceActivity.class);
+        startActivityForResult(myIntent,AddDeviceActivityRequest);
+		
+	}
+
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) 
+	{
+		switch (requestCode) 
+		{
+			case AddScheduleActivityRequest:
+				if (resultCode == RESULT_OK) {
+					_actionBarNavigationListener.getSchedulesListFragment().addSchedule("");					
+				}
+				break;
+			case AddDeviceActivityRequest:
+				if (resultCode == RESULT_OK) {
+					_actionBarNavigationListener.getDevicesListFragment().addDevice("");					
+				}
+				break;
+		}
+	}
+	
+	
+	
+	
+	
+	
+
+    
+
+  
     /*
 	 @Override        
 	 public void onSaveInstanceState(Bundle SavedInstanceState) 
@@ -141,9 +192,11 @@ public class MainActivity extends SherlockFragmentActivity
 	
 	public class ActionBarNavigationListener implements ActionBar.OnNavigationListener
 	{
-		DevicesListFragment _devicesListFragment;
-		SchedulesListFragment _schedulesListFragment;
+		private DevicesListFragment _devicesListFragment;
+		private SchedulesListFragment _schedulesListFragment;
 		
+		
+
 		public ActionBarNavigationListener()
 		{
 		}
@@ -152,9 +205,17 @@ public class MainActivity extends SherlockFragmentActivity
 		public boolean onNavigationItemSelected(int position, long itemId) 
 		{
 			if(position == 0)
+			{
+				_optionsMenu = R.menu.devices_list_fragment_menu;
+				MainActivity.this.invalidateOptionsMenu();
 				return displayDevicesFragment();
+			}
 			else
+			{
+				_optionsMenu = R.menu.schedules_list_fragment_menu;
+				MainActivity.this.invalidateOptionsMenu();
 				return displaySchedulesListFragment();
+			}
 		}
 		
 		
@@ -202,6 +263,8 @@ public class MainActivity extends SherlockFragmentActivity
 			
 			return _schedulesListFragment;
 		}
+
+	
 		
 	}
 	

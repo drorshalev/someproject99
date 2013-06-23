@@ -150,13 +150,17 @@ public class NetworkScanner implements Runnable, IHostEnumerator
 			
 			setContinue(true);
 			_scannerThread = new Thread(this);
+			_scannerThread.setDaemon(true);
 			_scannerThread.start();
 		} 
 	}
 
 	@Override
-	public void stop() {
-
+	public void stop() 
+	{
+		//TODO: should we implement this?
+		/*_messageHandler.removeMessages(UPDATE_PROGRESS);
+		_messageHandler.removeMessages(UPDATE_COMPLETE);*/
 		setContinue(false);
 	}
 	
