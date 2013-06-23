@@ -237,48 +237,6 @@ implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, 
 	}
 	
 	
-
-	/* @Override        
-	 public void onSaveInstanceState(Bundle SavedInstanceState) 
-	 {
-		 super.onSaveInstanceState(SavedInstanceState);
-		 
-		 Router r =  (Router)_netorkSpinner.getSelectedItem();
-		 if(r != null)
-			 SavedInstanceState.putString("CurrentRouterBssid", String.format("%d", _savedLiveDevicesMac.size()));
-		 
-		 if(_savedLiveDevicesMac.size() > 0)
-		 {
-			 SavedInstanceState.putString("LiveDevicesCount", Integer.toString(_savedLiveDevicesMac.size()));
-			 
-			 for(int i=0; i < _savedLiveDevicesMac.size(); ++i)
-				 SavedInstanceState.putString("Device_" + Integer.toString(i), _savedLiveDevicesMac.get(i));	 
-		 }
-		 
-		 Log.i(TAG, "Saved instance state");
-	 }
-	 
-	 public void restoreSavedState(Bundle SavedInstanceState)
-	 {
-		 if(SavedInstanceState != null)
-		 {
-			 _savedRouterBssid =  SavedInstanceState.getString("CurrentRouterBssid");
-			 
-			 if(SavedInstanceState.getString("LiveDevicesCount") != null)
-			 {
-				 int devicesCount = Integer.parseInt(SavedInstanceState.getString("LiveDevicesCount"));
-				 
-				 for(int i=0; i < devicesCount; ++i)
-				 {
-					 _savedLiveDevicesMac.add(SavedInstanceState.getString("Device_" + Integer.toString(i)));
-				 }
-			 }
-		 }
-		 
-	 }*/
-	 
-	
-	
 	@Override
 	public void onAttach (Activity activity)
 	{
@@ -439,6 +397,58 @@ implements OnScanProgressListener, OnScanCompleteListener, OnScanStartListener, 
 			return true;
 		}
 	}
+
+
+	//called after AddDeviceActivity has completed successfully
+	public void addDevice(String string) 
+	{
+		
+	}
+	
+	
+
+
+	/* @Override        
+	 public void onSaveInstanceState(Bundle SavedInstanceState) 
+	 {
+		 super.onSaveInstanceState(SavedInstanceState);
+		 
+		 Router r =  (Router)_netorkSpinner.getSelectedItem();
+		 if(r != null)
+			 SavedInstanceState.putString("CurrentRouterBssid", String.format("%d", _savedLiveDevicesMac.size()));
+		 
+		 if(_savedLiveDevicesMac.size() > 0)
+		 {
+			 SavedInstanceState.putString("LiveDevicesCount", Integer.toString(_savedLiveDevicesMac.size()));
+			 
+			 for(int i=0; i < _savedLiveDevicesMac.size(); ++i)
+				 SavedInstanceState.putString("Device_" + Integer.toString(i), _savedLiveDevicesMac.get(i));	 
+		 }
+		 
+		 Log.i(TAG, "Saved instance state");
+	 }
+	 
+	 public void restoreSavedState(Bundle SavedInstanceState)
+	 {
+		 if(SavedInstanceState != null)
+		 {
+			 _savedRouterBssid =  SavedInstanceState.getString("CurrentRouterBssid");
+			 
+			 if(SavedInstanceState.getString("LiveDevicesCount") != null)
+			 {
+				 int devicesCount = Integer.parseInt(SavedInstanceState.getString("LiveDevicesCount"));
+				 
+				 for(int i=0; i < devicesCount; ++i)
+				 {
+					 _savedLiveDevicesMac.add(SavedInstanceState.getString("Device_" + Integer.toString(i)));
+				 }
+			 }
+		 }
+		 
+	 }*/
+	 
+	
+	
 	
 	
 }

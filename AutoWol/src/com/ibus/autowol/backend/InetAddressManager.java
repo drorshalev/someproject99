@@ -33,7 +33,6 @@ public abstract class InetAddressManager
 		return name;
 	}
 	
-	
 
 	/*this seems to work differently to the native ping available in a linux / windows console.  will fail on a windows host that has a a firewall up*/
 	public static boolean ping(String ip, int timeOUt)

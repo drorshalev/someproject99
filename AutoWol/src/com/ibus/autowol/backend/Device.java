@@ -7,6 +7,12 @@ public class Device implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	
+	enum WakeProtocol
+	{
+		UDP,
+		TCP
+	}
+	
 	protected String name;
 	protected String displayName;	
 	protected int primaryKey;
@@ -16,8 +22,31 @@ public class Device implements Serializable
 	private int routerId;
 	private boolean isLive;
 	
+	//TODO: Figure out these methods of wake.  will any of them enable wake on wan
+	private String wakePort;
+	private WakeProtocol wakeProtocol;
+	private boolean broadcastWake;
+	
 	// Properties //////////////////////////////////////////////////////////
 
+	public boolean isBroadcastWake() {
+		return broadcastWake;
+	}
+	public void setBroadcastWake(boolean broadcastWake) {
+		this.broadcastWake = broadcastWake;
+	}
+	public WakeProtocol getWakeProtocol() {
+		return wakeProtocol;
+	}
+	public void setWakeProtocol(WakeProtocol wakeProtocol) {
+		this.wakeProtocol = wakeProtocol;
+	}
+	public String getWakePort() {
+		return wakePort;
+	}
+	public void setWakePort(String wakePort) {
+		this.wakePort = wakePort;
+	}
 	public boolean isLive() {
 		return isLive;
 	}

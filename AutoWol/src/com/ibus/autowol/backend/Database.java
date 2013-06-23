@@ -333,8 +333,8 @@ public class Database {
 	  public Router getRouterForBssid(String bssid) 
 	  {
 		  String[] params = {bssid};
+
 		  Cursor cursor = db.rawQuery(SQL_GET_ROUTER_FOR_BSSID, params);
-		  
 		  if(cursor.moveToFirst())
 			  return cursorRowToRouter(cursor);
 		  
